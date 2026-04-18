@@ -8,19 +8,26 @@ Owners can easily list their flats, confirm tenants, generate itemized monthly u
 
 ---
 
+## 👥 Team Members
+* **B K M Bodruzzaman** (ID: 23101426) - User Management & Marketplace
+* **Rashedul Karim Mahim** (ID: 23301521) - Tenancy Confirmation & Support
+* **B M Nafizur Rahman** (ID: 23301193) - Core Billing & Financial
+
+---
+
 ## 🚀 Key Features
 
-### 👤 Member 1: User Management & Marketplace Module
+### 👤 Member 1: B K M Bodruzzaman (ID: 23101426) - User Management & Marketplace Module
 * **Role-Based Registration & Login:** A secure authentication system routing Flat Owners and Tenants to their respective dedicated dashboards using PHP sessions.
 * **To-Let Advertisement Posting (Owner):** A dynamic form for Owners to list new flats, capturing details like location area, square footage, bedrooms, and asking rent. Flats are saved with a default 'Available' status.
 * **Advanced Search & Filter (Tenant):** A public-facing gallery allowing Tenants to search for 'Available' flats. Includes a robust filter engine using SQL `WHERE` and `AND` clauses to narrow results by area, maximum budget, and size.
 
-### 👤 Member 2: Tenancy Confirmation & Support Module
+### 👤 Member 2: Rashedul Karim Mahim (ID: 23301521) - Tenancy Confirmation & Support Module
 * **Rental Request & Confirmation System:** Tenants can express interest via an "I am interested" button. Owners review these requests and click "Confirm" to officially link the Tenant to the flat, automatically updating the flat's status to 'Rented'.
 * **Advance Payment (Security Deposit) Log:** A transparent ledger where Owners input the initial security deposit/advance money received. This ledger is permanently visible on the Tenant's dashboard.
 * **Maintenance & Issue Reporting:** A "Complain Box" feature allowing Tenants to report physical flat issues (e.g., plumbing, electrical). Owners track these active tickets and mark them as 'Solved' upon resolution.
 
-### 👤 Member 3: Core Billing & Financial Module
+### 👤 Member 3: B M Nafizur Rahman (ID: 23301193) - Core Billing & Financial Module
 * **Monthly Bill Generation (Owner):** A billing engine allowing Owners to input monthly fluctuating utilities (gas, electricity, water, service charges). The backend calculates the total payable amount alongside the base rent.
 * **Tenant Billing Dashboard:** A detailed financial view for Tenants, fetching their current month's bill via SQL `JOIN`s to display a clear, itemized breakdown of rent and specific utilities.
 * **Payment Confirmation & Digital Receipt:** A management tool for Owners to mark pending bills as 'Paid'. This action automatically generates a digital payment receipt accessible from the Tenant's portal.
@@ -30,7 +37,7 @@ Owners can easily list their flats, confirm tenants, generate itemized monthly u
 ## 📊 Database Schema (EER Diagram)
 Below is the Enhanced Entity-Relationship (EER) diagram illustrating the database architecture, including the inheritance (IS-A) relationships for users and the associative entities linking owners, tenants, and flats.
 
-![System EER Diagram](house_rent_system.png)
+![System EER Diagram](eer_diagram.png)
 
 ---
 
