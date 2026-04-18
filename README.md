@@ -30,7 +30,7 @@ Owners can easily list their flats, confirm tenants, generate itemized monthly u
 ## 📊 Database Schema (EER Diagram)
 Below is the Enhanced Entity-Relationship (EER) diagram illustrating the database architecture, including the inheritance (IS-A) relationships for users and the associative entities linking owners, tenants, and flats.
 
-![System EER Diagram](eer_diagram.png)
+![System EER Diagram](house_rent_system.png)
 
 ---
 
