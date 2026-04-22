@@ -43,7 +43,7 @@ Below is the Enhanced Entity-Relationship (EER) diagram illustrating the databas
 
 ## 🗄️ Relational Schema
 
-![System Schema Diagram](schema.png)
+![System Schema Diagram](schema_updated.png)
 ---
 
 ## 🛠️ Technologies Used
