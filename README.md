@@ -2,43 +2,48 @@
 **Course:** CSE-370 (Database Systems) | **Institution:** BRAC University
 
 ## 📖 Project Overview
-The House Rent Management System is a centralized web application designed to bridge the gap between flat owners and tenants, tailored for local rental structures. It serves a dual purpose: acting as a searchable marketplace for available properties and functioning as a comprehensive management dashboard for active tenancies. 
+The House Rent Management System is a centralized web application designed to bridge the gap between flat owners and tenants, tailored for local rental structures. It serves a dual purpose: acting as a searchable marketplace for available properties and functioning as a comprehensive management dashboard for active tenancies.
 
-Owners can easily list their flats, confirm tenants, generate itemized monthly utility bills, and track maintenance issues. Tenants are provided with a dedicated portal to search for housing using specific filters, securely view their monthly rental and utility breakdowns, and report physical flat issues directly to the owner. The system ensures transparency by tracking advance security deposits and generating digital payment receipts.
+This platform ensures a secure and smooth experience. Owners can list flats, manage monthly billing, and track advance security deposits. Tenants can find their ideal homes using area-based filters, securely view their bill breakdowns, and report complaints. A key feature is the integrated **Mutual Rating System**, where owners and tenants can rate each other, ensuring accountability and transparency in the rental ecosystem.
 
 ---
 
 ## 👥 Team Members
 * **B K M Bodruzzaman** (ID: 23101426) - User Management & Marketplace
-* **Rashedul Karim Mahim** (ID: 23301521) - Tenancy Confirmation & Support
-* **B M Nafizur Rahman** (ID: 23301193) - Core Billing & Financial
+* **Rashedul Karim Mahim** (ID: 23301521) - Tenancy Support & Rating System
+* **B M Nafizur Rahman** (ID: 23301193) - Core Billing & Agreement Module
 
 ---
 
 ## 🚀 Key Features
 
-### 👤 Member 1: B K M Bodruzzaman (ID: 23101426) - User Management & Marketplace Module
-* **Role-Based Registration & Login:** A secure authentication system routing Flat Owners and Tenants to their respective dedicated dashboards using PHP sessions.
-* **To-Let Advertisement Posting (Owner):** A dynamic form for Owners to list new flats, capturing details like location area, square footage, bedrooms, and asking rent. Flats are saved with a default 'Available' status.
-* **Advanced Search & Filter (Tenant):** A public-facing gallery allowing Tenants to search for 'Available' flats. Includes a robust filter engine using SQL `WHERE` and `AND` clauses to narrow results by area, maximum budget, and size.
+### 👤 Member 1: B K M Bodruzzaman (ID: 23101426)
+* **Role-Based Registration & Login:** A secure authentication system routing Owners and Tenants to their respective dedicated dashboards.
+* **To-Let Advertisement Posting (Owner):** Form for Owners to list flats with details (area, square feet, rent) with a default 'Available' status.
+* **Advanced Search & Filter (Tenant):** Gallery allowing Tenants to filter available flats using SQL `WHERE` and `AND` queries by location, budget, and size.
 
-### 👤 Member 2: Rashedul Karim Mahim (ID: 23301521) - Tenancy Confirmation & Support Module
-* **Rental Request & Confirmation System:** Tenants can express interest via an "I am interested" button. Owners review these requests and click "Confirm" to officially link the Tenant to the flat, automatically updating the flat's status to 'Rented'.
-* **Advance Payment (Security Deposit) Log:** A transparent ledger where Owners input the initial security deposit/advance money received. This ledger is permanently visible on the Tenant's dashboard.
-* **Maintenance & Issue Reporting:** A "Complain Box" feature allowing Tenants to report physical flat issues (e.g., plumbing, electrical). Owners track these active tickets and mark them as 'Solved' upon resolution.
+### 👤 Member 2: Rashedul Karim Mahim (ID: 23301521)
+* **Rental Request & Confirmation System:** Tenant expressions of interest; Owner reviews and clicks "Confirm" to officially link the Tenant to the flat and mark the flat as 'Rented'.
+* **Maintenance & Issue Reporting:** "Complain Box" for Tenants to report flat issues. Owners track active complaints and mark them as 'Solved' upon resolution.
+* **Mutual Rating System:** Tenants can rate owners, and owners can rate tenants based on behavior (1-5 star scale). These averages are displayed on their respective profiles for future reference.
 
-### 👤 Member 3: B M Nafizur Rahman (ID: 23301193) - Core Billing & Financial Module
-* **Monthly Bill Generation (Owner):** A billing engine allowing Owners to input monthly fluctuating utilities (gas, electricity, water, service charges). The backend calculates the total payable amount alongside the base rent.
-* **Tenant Billing Dashboard:** A detailed financial view for Tenants, fetching their current month's bill via SQL `JOIN`s to display a clear, itemized breakdown of rent and specific utilities.
-* **Payment Confirmation & Digital Receipt:** A management tool for Owners to mark pending bills as 'Paid'. This action automatically generates a digital payment receipt accessible from the Tenant's portal.
+### 👤 Member 3: B M Nafizur Rahman (ID: 23301193)
+* **Advance Payment & First Month's Entry:** Once a tenant is confirmed, the Owner formally enters the security deposit (advance) and the first month's initial rent amount into the Agreement.
+* **Dynamic Monthly Bill Generation:** Owners input monthly utilities (gas, electricity, water, service charges) which PHP combines with base rent for a total bill.
+* **Payment Confirmation & Due Tracker:** Tenants can view bill itemizations, and Owners mark bills as 'Paid' to automatically generate printable digital money receipts.
 
 ---
 
 ## 📊 Database Schema (EER Diagram)
-Below is the Enhanced Entity-Relationship (EER) diagram illustrating the database architecture, including the inheritance (IS-A) relationships for users and the associative entities linking owners, tenants, and flats.
+Below is the Enhanced Entity-Relationship (EER) diagram illustrating the database architecture, including the inheritance (IS-A) relationships for users, the associative agreement linking entities, and the newly integrated Rating system.
 
 ![System EER Diagram](eer_diagram.png)
 
+---
+
+## 🗄️ Relational Schema
+
+![System Schema Diagram](schema.png)
 ---
 
 ## 🛠️ Technologies Used
