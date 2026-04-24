@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Bill Generated Successfully</h2>
+<p>Month: {{ month }}</p>
+<p>Total Amount: {{ total }}</p>
+<p>Status: Unpaid</p>
+<a href="/generate_bill">Generate Another Bill</a>
+{% endblock %}
