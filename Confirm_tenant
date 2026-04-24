@@ -1,0 +1,13 @@
+@app.route('/confirm/<int:id>')
+def confirm(id):
+    cursor.execute("SELECT * FROM flat_requests WHERE request_id=%s", (id,))
+    r = cursor.fetchone()
+
+    cursor.execute("INSERT INTO tenancies (flat_id, tenant_id, owner_id, start_date) VALUES (%s,%s,%s,CURDATE())",
+                   (r['flat_id'], r['tenant_id'], r['owner_id']))
+
+    cursor.execute("UPDATE flats SET status='Rented' WHERE flat_id=%s", (r['flat_id'],))
+    cursor.execute("UPDATE flat_requests SET status='Approved' WHERE request_id=%s", (id,))
+    db.commit()
+
+    return redirect('/owner_dashboard')
