@@ -12,9 +12,8 @@ $owner = mysqli_fetch_assoc($result);
 
 // Insert request
 $insert = "INSERT INTO flat_requests (flat_id, tenant_id, owner_id)
-           VALUES ('$flat_id', '$tenant_id', '".$owner['owner_id']."')";
+           VALUES ('$flat_id', '$tenant_id', '" . $owner['owner_id'] . "')";
 
 mysqli_query($conn, $insert);
 
 header("Location: tenant_dashboard.php");
-?>

@@ -1,5 +1,4 @@
 <?php
-// Check if a role is selected from the URL
 $role = isset($_GET['role']) ? $_GET['role'] : '';
 ?>
 <!DOCTYPE html>
