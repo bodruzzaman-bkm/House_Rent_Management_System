@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'config/db_connect.php'; // ডাটাবেস কানেকশন যুক্ত করা হলো
+require_once 'config/db_connect.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'tenant') {
     header("Location: login.php");
@@ -31,7 +31,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'tenant') {
         </div>
 
         <?php
-        // ডাটাবেস থেকে শুধু Available ফ্লাটগুলো তুলে আনা হচ্ছে
         $sql = "SELECT * FROM flat WHERE status = 'Available' ORDER BY flat_id DESC";
         $result = $conn->query($sql);
 

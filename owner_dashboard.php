@@ -1,7 +1,6 @@
 <?php
 session_start();
-require_once 'config/db_connect.php'; // ডাটাবেস কানেকশন যুক্ত করা হলো
-
+require_once 'config/db_connect.php';
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'owner') {
     header("Location: login.php");
     exit();
@@ -45,7 +44,6 @@ $owner_id = $_SESSION['user_id'];
 
         if ($result->num_rows > 0) {
             while ($flat = $result->fetch_assoc()) {
-                // স্ট্যাটাস অনুযায়ী রং পরিবর্তন করার লজিক
                 $status_color = ($flat['status'] == 'Available') ? 'green' : 'red';
         ?>
 
