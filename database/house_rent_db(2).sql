@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 26, 2026 at 05:48 PM
+-- Generation Time: Apr 28, 2026 at 05:54 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -57,11 +57,25 @@ CREATE TABLE `complaint` (
 CREATE TABLE `flat` (
   `flat_id` int(11) NOT NULL,
   `area` int(11) NOT NULL,
+  `location` varchar(100) NOT NULL,
   `asking_rent` int(11) NOT NULL,
   `bedroom` int(11) NOT NULL,
+  `floor` int(11) NOT NULL,
+  `detailed_location` varchar(2000) NOT NULL,
   `status` varchar(50) NOT NULL,
   `owner_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `flat`
+--
+
+INSERT INTO `flat` (`flat_id`, `area`, `location`, `asking_rent`, `bedroom`, `floor`, `detailed_location`, `status`, `owner_id`) VALUES
+(1, 1200, 'South Badda', 23000, 2, 6, 'Rajnandan, Ka, 3/1, Titas Road, South Badda, Dhaka', 'Available', 2),
+(2, 1200, 'Merul Badda', 20000, 3, 2, 'House No: 12, Road No: 16, DIT Project, Merul Badda, Dhaka', 'Available', 2),
+(3, 20000, 'Adabor', 30000, 3, 5, 'Adabor-1, Shompa Market', 'Available', 2),
+(4, 1000, 'Mohammadpur', 15000, 2, 5, 'Nurjahan Road, Mohammadpur', 'Available', 2),
+(5, 1200, 'Nakhalpara', 15000, 2, 6, 'Lucas Mor, Nakhalpara', 'Available', 2);
 
 -- --------------------------------------------------------
 
@@ -109,7 +123,8 @@ CREATE TABLE `owner` (
 --
 
 INSERT INTO `owner` (`user_id`, `bank_name`, `account_number`, `branch_name`) VALUES
-(2, 'Brac Bank', '125874963587', 'Mohakhali');
+(2, 'Brac Bank', '125874963587', 'Mohakhali'),
+(3, 'Estern Bank', '522147932587458', 'Mohammadpur, Dhaka');
 
 -- --------------------------------------------------------
 
@@ -179,7 +194,8 @@ CREATE TABLE `user` (
 
 INSERT INTO `user` (`user_id`, `name`, `nid`, `phone`, `email`, `password`) VALUES
 (1, 'Bodruzzaman', '1234567890', '01234567891', 'abc@abc.com', '$2y$10$QV/.wTLc5lqoYjqV7qrPfuoKJ6Z3P7sOEShMgMS6eHWdB3ZWvIrSG'),
-(2, 'Hasanuzzaman', '5412635871', '01254698724', 'def@def.com', '$2y$10$ZqFIumnxDjoilGz0vSD7/.aLQey1QrPo2.BL2RnAh9q0C26R40ezO');
+(2, 'Hasanuzzaman', '5412635871', '01254698724', 'def@def.com', '$2y$10$ZqFIumnxDjoilGz0vSD7/.aLQey1QrPo2.BL2RnAh9q0C26R40ezO'),
+(3, 'Nazrul Islam', '2541896357', '15789632874', 'nazrul@abc.com', '$2y$10$KZG7p/blLyDx7XQdhbAjgOBWo3ri0SzGWl8NkVEVt12m.9mmX90XW');
 
 --
 -- Indexes for dumped tables
@@ -276,7 +292,7 @@ ALTER TABLE `complaint`
 -- AUTO_INCREMENT for table `flat`
 --
 ALTER TABLE `flat`
-  MODIFY `flat_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `flat_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `rating`
@@ -294,7 +310,7 @@ ALTER TABLE `request`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables

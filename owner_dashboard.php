@@ -1,9 +1,13 @@
 <?php
 session_start();
+require_once 'config/db_connect.php'; // ডাটাবেস কানেকশন যুক্ত করা হলো
+
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'owner') {
     header("Location: login.php");
     exit();
 }
+
+$owner_id = $_SESSION['user_id'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,22 +30,49 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'owner') {
         <div class="action-bar">
             <h2>My Listed Flats</h2>
             <div>
-                <a href="#" class="btn-post">+ Post New Flat</a>
+                <a href="post_flat.php" class="btn-post">+ Post New Flat</a>
                 <a href="actions/logout_action.php" class="btn-logout">Logout</a>
             </div>
         </div>
 
-        <div class="flat-card border-owner">
-            <h3>Flat ID: #101</h3>
-            <p><strong>Area:</strong> Banani | <strong>Bedrooms:</strong> 3 | <strong>Asking Rent:</strong> 25,000 BDT</p>
-            <p><strong>Status:</strong> Available</p>
-        </div>
+        <?php
+        // ডাটাবেস থেকে এই মালিকের ফ্লাটগুলো তুলে আনা হচ্ছে
+        $sql = "SELECT * FROM flat WHERE owner_id = ? ORDER BY flat_id DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $owner_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-        <div class="flat-card border-owner">
-            <h3>Flat ID: #102</h3>
-            <p><strong>Area:</strong> Gulshan | <strong>Bedrooms:</strong> 4 | <strong>Asking Rent:</strong> 40,000 BDT</p>
-            <p><strong>Status:</strong> Rented</p>
-        </div>
+        if ($result->num_rows > 0) {
+            while ($flat = $result->fetch_assoc()) {
+                // স্ট্যাটাস অনুযায়ী রং পরিবর্তন করার লজিক
+                $status_color = ($flat['status'] == 'Available') ? 'green' : 'red';
+        ?>
+
+                <div class="flat-card border-owner">
+                    <h3>Flat ID: #<?php echo $flat['flat_id']; ?>
+                        <span style="font-size: 14px; float: right; color: <?php echo $status_color; ?>;">
+                            [<?php echo $flat['status']; ?>]
+                        </span>
+                    </h3>
+                    <p><strong>Location:</strong> <?php echo htmlspecialchars($flat['location']); ?></p>
+                    <p><strong>Detailed Address:</strong> <?php echo htmlspecialchars($flat['detailed_location']); ?></p>
+                    <p>
+                        <strong>Floor:</strong> <?php echo $flat['floor']; ?> |
+                        <strong>Area:</strong> <?php echo $flat['area']; ?> sq ft |
+                        <strong>Bedrooms:</strong> <?php echo $flat['bedroom']; ?>
+                    </p>
+                    <p style="font-size: 18px; color: #007BFF;"><strong>Asking Rent:</strong> <?php echo number_format($flat['asking_rent']); ?> BDT</p>
+                </div>
+
+        <?php
+            }
+        } else {
+            echo "<p style='text-align: center; padding: 20px; background-color: white; border-radius: 5px;'>You haven't posted any flats yet. Click '+ Post New Flat' to get started!</p>";
+        }
+        $stmt->close();
+        ?>
+
     </div>
 
 </body>
