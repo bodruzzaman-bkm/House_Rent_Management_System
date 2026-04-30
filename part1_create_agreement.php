@@ -40,3 +40,10 @@ Advance: <input name="advance"><br>
 Start Date: <input type="date" name="start_date"><br>
 <button name="submit">Create Agreement</button>
 </form>
+
+/*
+git cmd 
+git add . 
+git commit -m "your commit message"
+git push 
+*/
