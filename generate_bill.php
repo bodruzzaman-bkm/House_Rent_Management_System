@@ -169,22 +169,53 @@ $defaultMonth = date('Y-m');
                     </div>
                 </div>
 
+                <div class="form-row single">
+                    <div>
+                        <label for="bill_preview">Total Bill Preview</label>
+                        <input type="text" id="bill_preview" value="0" readonly>
+                    </div>
+                </div>
+
                 <button type="submit" name="submit">Generate Bill</button>
             </form>
-            <p class="info-text">The total bill amount will be calculated from base rent and utilities and saved as an unpaid bill.</p>
+            <p class="info-text">The total bill amount is base rent plus electricity, gas, water, and service charges.</p>
         <?php endif; ?>
     </div>
 
     <script>
         const agreementSelect = document.getElementById('agreement_id');
         const baseRentInput = document.getElementById('base_rent');
+        const electricityInput = document.getElementById('electricity');
+        const gasInput = document.getElementById('gas');
+        const waterInput = document.getElementById('water');
+        const serviceChargeInput = document.getElementById('service_charge');
+        const billPreviewInput = document.getElementById('bill_preview');
+
+        function updateBillPreview() {
+            const baseRent = Number(baseRentInput?.value || 0);
+            const electricity = Number(electricityInput?.value || 0);
+            const gas = Number(gasInput?.value || 0);
+            const water = Number(waterInput?.value || 0);
+            const serviceCharge = Number(serviceChargeInput?.value || 0);
+
+            if (billPreviewInput) {
+                billPreviewInput.value = baseRent + electricity + gas + water + serviceCharge;
+            }
+        }
 
         agreementSelect?.addEventListener('change', function () {
             const selected = agreementSelect.selectedOptions[0];
             if (selected) {
                 baseRentInput.value = selected.dataset.baseRent || '0';
             }
+            updateBillPreview();
         });
+
+        [electricityInput, gasInput, waterInput, serviceChargeInput].forEach(function (input) {
+            input?.addEventListener('input', updateBillPreview);
+        });
+
+        updateBillPreview();
     </script>
 </body>
 </html>
