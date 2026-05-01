@@ -30,6 +30,7 @@ $owner_id = $_SESSION['user_id'];
             <h2>My Listed Flats</h2>
             <div>
                 <a href="post_flat.php" class="btn-post">+ Post New Flat</a>
+                <a href="generate_bill.php" class="btn-post">Generate Monthly Bill</a>
                 <a href="actions/logout_action.php" class="btn-logout">Logout</a>
             </div>
         </div>

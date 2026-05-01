@@ -102,6 +102,9 @@ CREATE TABLE `monthly_bill` (
   `maintanance` int(11) NOT NULL,
   `electricity` int(11) NOT NULL,
   `gas` int(11) NOT NULL,
+  `water` int(11) NOT NULL,
+  `service_charge` int(11) NOT NULL,
+  `total_amount` int(11) NOT NULL,
   `payment_status` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

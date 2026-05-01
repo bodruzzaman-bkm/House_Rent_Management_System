@@ -1,16 +1,15 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['total']) || !isset($_SESSION['month'])) {
+if (!isset($_SESSION['bill_total']) || !isset($_SESSION['bill_month'])) {
     header("Location: generate_bill.php");
     exit();
 }
 
-$total = $_SESSION['total'];
-$month = $_SESSION['month'];
+$total = $_SESSION['bill_total'];
+$month = $_SESSION['bill_month'];
 
-session_unset();
-session_destroy();
+unset($_SESSION['bill_total'], $_SESSION['bill_month']);
 ?>
 
 <!DOCTYPE html>

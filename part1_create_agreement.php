@@ -23,7 +23,8 @@ if (isset($_POST['submit'])) {
         $base_rent = $data['asking_rent'];
 
         $sql2 = "INSERT INTO monthly_bill 
-        VALUES ('$agreement_id','$month','$base_rent',0,0,0,'Unpaid')";
+        (agreement_id, billing_month, base_rent, maintanance, electricity, gas, water, service_charge, total_amount, payment_status)
+        VALUES ('$agreement_id','$month','$base_rent',0,0,0,0,0,'$base_rent','Unpaid')";
 
         $conn->query($sql2);
 
@@ -77,8 +78,8 @@ if (isset($_POST['submit'])) {
 
         // 3. Insert first bill
         $sql2 = "INSERT INTO monthly_bill 
-        (agreement_id, billing_month, base_rent, maintenance, electricity, gas, payment_status)
-        VALUES ('$agreement_id','$month','$base_rent',0,0,0,'Unpaid')";
+        (agreement_id, billing_month, base_rent, maintanance, electricity, gas, water, service_charge, total_amount, payment_status)
+        VALUES ('$agreement_id','$month','$base_rent',0,0,0,0,0,'$base_rent','Unpaid')";
 
         if ($conn->query($sql2)) {
             echo "Agreement + First Bill Created Successfully!";
