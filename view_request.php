@@ -1,8 +1,8 @@
 <?php
 session_start();
-include("config/db.php");
+include("db.php");
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'owner') {
     header("Location: login.php");
     exit();
 }
@@ -13,9 +13,11 @@ $query = "SELECT r.request_id, u.name, f.location, r.request_status
           FROM request r
           JOIN flat f ON r.flat_id = f.flat_id
           JOIN user u ON r.tenant_id = u.user_id
-          WHERE f.owner_id = '$owner_id'";
-
-$result = mysqli_query($conn, $query);
+          WHERE f.owner_id = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param('i', $owner_id);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>

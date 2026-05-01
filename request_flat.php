@@ -1,19 +1,38 @@
 <?php
 session_start();
-include("config/db.php");
+include("db.php");
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
 
 $tenant_id = $_SESSION['user_id'];
-$flat_id = $_GET['id'];
+$flat_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-// Get owner id
-$query = "SELECT owner_id FROM flats WHERE flat_id='$flat_id'";
-$result = mysqli_query($conn, $query);
-$owner = mysqli_fetch_assoc($result);
+if ($flat_id <= 0) {
+    header("Location: tenant_dashboard.php");
+    exit();
+}
 
-// Insert request
-$insert = "INSERT INTO flat_requests (flat_id, tenant_id, owner_id)
-           VALUES ('$flat_id', '$tenant_id', '" . $owner['owner_id'] . "')";
+$query = "SELECT owner_id FROM flat WHERE flat_id = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param('i', $flat_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$owner = $result->fetch_assoc();
+$stmt->close();
 
-mysqli_query($conn, $insert);
+if (!$owner) {
+    header("Location: tenant_dashboard.php");
+    exit();
+}
+
+$insert = "INSERT INTO request (date, request_status, tenant_id, flat_id)
+           VALUES (CURDATE(), 'Pending', ?, ?)";
+$stmt = $conn->prepare($insert);
+$stmt->bind_param('ii', $tenant_id, $flat_id);
+$stmt->execute();
+$stmt->close();
 
 header("Location: tenant_dashboard.php");
