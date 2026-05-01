@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'config/db_connect.php';
+include 'db.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'owner') {
     header('Location: login.php');
@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'owner') {
 
 $owner_id = $_SESSION['user_id'];
 $error = '';
+$base_rent = 0;
 
 $agreements = [];
 $query = "SELECT a.agreement_id, l.flat_id, l.tenant_id, u.name AS tenant_name, f.location, f.asking_rent AS base_rent

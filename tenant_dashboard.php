@@ -1,11 +1,15 @@
 <?php
 session_start();
-require_once 'config/db_connect.php';
+include 'db.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'tenant') {
     header("Location: login.php");
     exit();
 }
+
+$message = $_SESSION['request_message'] ?? '';
+$message_type = $_SESSION['request_message_type'] ?? '';
+unset($_SESSION['request_message'], $_SESSION['request_message_type']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -27,11 +31,21 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'tenant') {
 
         <div class="action-bar">
             <h2>Available Flats to Rent</h2>
-            <a href="actions/logout_action.php" class="btn-logout">Logout</a>
+            <div>
+                <a href="browse_flats.php" class="btn-post">Browse Flats</a>
+                <a href="tenant_bills.php" class="btn-post">View My Bills</a>
+                <a href="actions/logout_action.php" class="btn-logout">Logout</a>
+            </div>
         </div>
 
+        <?php if ($message): ?>
+            <div style="margin: 20px auto; max-width: 700px; padding: 12px 16px; border-radius: 6px; background: <?php echo $message_type === 'success' ? '#d4edda' : ($message_type === 'error' ? '#f8d7da' : '#fff3cd'); ?>; border: 1px solid <?php echo $message_type === 'success' ? '#c3e6cb' : ($message_type === 'error' ? '#f5c6cb' : '#ffeeba'); ?>; color: <?php echo $message_type === 'success' ? '#155724' : ($message_type === 'error' ? '#721c24' : '#856404'); ?>;">
+                <?php echo htmlspecialchars($message); ?>
+            </div>
+        <?php endif; ?>
+
         <?php
-        $sql = "SELECT * FROM flat WHERE status = 'Available' ORDER BY flat_id DESC";
+        $sql = "SELECT * FROM flat WHERE status IN ('Available', 'available', 'AVAILABLE') ORDER BY flat_id DESC";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {

@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $tenant_id = $_SESSION['user_id'];
 
-$query = "SELECT a.advance, f.location
+$query = "SELECT a.advance, a.first_month_rent, f.location
           FROM agreement a
           JOIN links l ON a.agreement_id = l.agreement_id
           JOIN flat f ON l.flat_id = f.flat_id
@@ -31,7 +31,8 @@ $result = mysqli_query($conn, $query);
     <?php while ($row = mysqli_fetch_assoc($result)) { ?>
         <p>
             Location: <?php echo htmlspecialchars($row['location']); ?><br>
-            Advance: <?php echo htmlspecialchars($row['advance']); ?>
+            Advance: <?php echo htmlspecialchars($row['advance']); ?><br>
+            First Month Rent: <?php echo htmlspecialchars($row['first_month_rent']); ?>
         </p>
         <hr>
     <?php } ?>

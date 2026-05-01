@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'config/db_connect.php';
+include 'db.php';
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'owner') {
     header("Location: login.php");
     exit();
@@ -30,13 +30,14 @@ $owner_id = $_SESSION['user_id'];
             <h2>My Listed Flats</h2>
             <div>
                 <a href="post_flat.php" class="btn-post">+ Post New Flat</a>
+                <a href="view_requests.php" class="btn-post">View Rental Requests</a>
                 <a href="generate_bill.php" class="btn-post">Generate Monthly Bill</a>
+                <a href="owner_bills.php" class="btn-post">Manage Bills</a>
                 <a href="actions/logout_action.php" class="btn-logout">Logout</a>
             </div>
         </div>
 
         <?php
-        // ডাটাবেস থেকে এই মালিকের ফ্লাটগুলো তুলে আনা হচ্ছে
         $sql = "SELECT * FROM flat WHERE owner_id = ? ORDER BY flat_id DESC";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $owner_id);
@@ -45,13 +46,14 @@ $owner_id = $_SESSION['user_id'];
 
         if ($result->num_rows > 0) {
             while ($flat = $result->fetch_assoc()) {
-                $status_color = ($flat['status'] == 'Available') ? 'green' : 'red';
+                $flat_status = !empty($flat['status']) ? $flat['status'] : 'Unknown';
+                $status_color = (strtolower($flat_status) === 'available') ? 'green' : 'red';
         ?>
 
                 <div class="flat-card border-owner">
-                    <h3>Flat ID: #<?php echo $flat['flat_id']; ?>
+                    <h3>Flat ID: #<?php echo htmlspecialchars($flat['flat_id']); ?>
                         <span style="font-size: 14px; float: right; color: <?php echo $status_color; ?>;">
-                            [<?php echo $flat['status']; ?>]
+                            [<?php echo htmlspecialchars($flat_status); ?>]
                         </span>
                     </h3>
                     <p><strong>Location:</strong> <?php echo htmlspecialchars($flat['location']); ?></p>

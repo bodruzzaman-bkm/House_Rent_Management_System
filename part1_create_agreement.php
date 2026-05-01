@@ -14,8 +14,12 @@ if (isset($_POST['submit'])) {
     if (!$tenant_id || !$flat_id || !$owner_id || !$start_date) {
         $message = 'All fields are required.';
     } else {
-        $sql1 = "INSERT INTO agreement (advance, start_date, owner_id)
-                 VALUES ('$advance','$start_date','$owner_id')";
+        $res = $conn->query("SELECT asking_rent FROM flat WHERE flat_id='$flat_id'");
+        $data = $res->fetch_assoc();
+        $base_rent = $data['asking_rent'];
+
+        $sql1 = "INSERT INTO agreement (advance, start_date, first_month_rent, owner_id)
+                     VALUES ('$advance','$start_date','$base_rent','$owner_id')";
 
         if ($conn->query($sql1)) {
             $agreement_id = $conn->insert_id;
@@ -23,13 +27,9 @@ if (isset($_POST['submit'])) {
             $conn->query("INSERT INTO links (agreement_id, tenant_id, flat_id)
                           VALUES ('$agreement_id', '$tenant_id', '$flat_id')");
 
-            $res = $conn->query("SELECT asking_rent FROM flat WHERE flat_id='$flat_id'");
-            $data = $res->fetch_assoc();
-            $base_rent = $data['asking_rent'];
-
             $sql2 = "INSERT INTO monthly_bill 
                      (agreement_id, billing_month, base_rent, maintanance, electricity, gas, water, service_charge, total_amount, payment_status)
-                     VALUES ('$agreement_id','$month','$base_rent',0,0,0,0,0,'$base_rent','Unpaid')";
+                     VALUES ('$agreement_id','$month','$base_rent',0,0,0,0,0,0,'$base_rent','Unpaid')";
 
             if ($conn->query($sql2)) {
                 $message = 'Agreement created and first month bill recorded successfully.';

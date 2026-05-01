@@ -31,6 +31,7 @@ CREATE TABLE `agreement` (
   `agreement_id` int(11) NOT NULL,
   `advance` int(11) NOT NULL,
   `start_date` date NOT NULL,
+  `first_month_rent` int(11) NOT NULL DEFAULT 0,
   `owner_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

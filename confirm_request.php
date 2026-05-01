@@ -59,8 +59,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $updateFlat->execute();
             $updateFlat->close();
 
-            $insertAgreement = $conn->prepare("INSERT INTO agreement (advance, start_date, owner_id) VALUES (?, ?, ?)");
-            $insertAgreement->bind_param('dsi', $advance, $start_date, $owner_id);
+            $base_rent = intval($request['asking_rent']);
+
+            $insertAgreement = $conn->prepare("INSERT INTO agreement (advance, start_date, first_month_rent, owner_id) VALUES (?, ?, ?, ?)");
+            $insertAgreement->bind_param('dsii', $advance, $start_date, $base_rent, $owner_id);
             $insertAgreement->execute();
             $agreement_id = $conn->insert_id;
             $insertAgreement->close();
@@ -71,7 +73,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $insertLink->close();
 
             $billing_month = date('F-Y', strtotime($start_date));
-            $base_rent = intval($request['asking_rent']);
             $total_amount = $base_rent;
             $payment_status = 'Unpaid';
 
