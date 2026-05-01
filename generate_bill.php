@@ -75,21 +75,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $total_amount = $base_rent + $electricity + $gas + $water + $service_charge;
         $payment_status = 'Unpaid';
 
-        $insertSql = "INSERT INTO monthly_bill
-                      (agreement_id, billing_month, base_rent, maintanance, electricity, gas, water, service_charge, total_amount, payment_status)
-                      VALUES (?, ?, ?, 0, ?, ?, ?, ?, ?, ?)";
-        $insertStmt = $conn->prepare($insertSql);
-        $insertStmt->bind_param('isiiiiiis', $agreement_id, $billing_month, $base_rent, $electricity, $gas, $water, $service_charge, $total_amount, $payment_status);
+        $existingSql = "SELECT agreement_id FROM monthly_bill WHERE agreement_id = ? AND billing_month = ? LIMIT 1";
+        $existingStmt = $conn->prepare($existingSql);
+        $existingStmt->bind_param('is', $agreement_id, $billing_month);
+        $existingStmt->execute();
+        $existingResult = $existingStmt->get_result();
 
-        if ($insertStmt->execute()) {
-            $_SESSION['bill_total'] = $total_amount;
-            $_SESSION['bill_month'] = $billing_month;
-            header('Location: success.php');
-            exit();
+        if ($existingResult->num_rows > 0) {
+            $updateSql = "UPDATE monthly_bill
+                          SET base_rent = ?, maintanance = 0, electricity = ?, gas = ?, water = ?, service_charge = ?, total_amount = ?, payment_status = ?
+                          WHERE agreement_id = ? AND billing_month = ?";
+            $updateStmt = $conn->prepare($updateSql);
+            $updateStmt->bind_param('iiiiisiss', $base_rent, $electricity, $gas, $water, $service_charge, $total_amount, $payment_status, $agreement_id, $billing_month);
+
+            if ($updateStmt->execute()) {
+                $_SESSION['bill_total'] = $total_amount;
+                $_SESSION['bill_month'] = $billing_month;
+                $_SESSION['bill_message'] = 'Existing bill updated for this month.';
+                header('Location: success.php');
+                exit();
+            }
+
+            $error = 'Unable to update bill: ' . $updateStmt->error;
+            $updateStmt->close();
         } else {
+            $insertSql = "INSERT INTO monthly_bill
+                          (agreement_id, billing_month, base_rent, maintanance, electricity, gas, water, service_charge, total_amount, payment_status)
+                          VALUES (?, ?, ?, 0, ?, ?, ?, ?, ?, ?)";
+            $insertStmt = $conn->prepare($insertSql);
+            $insertStmt->bind_param('isiiiiiis', $agreement_id, $billing_month, $base_rent, $electricity, $gas, $water, $service_charge, $total_amount, $payment_status);
+
+            if ($insertStmt->execute()) {
+                $_SESSION['bill_total'] = $total_amount;
+                $_SESSION['bill_month'] = $billing_month;
+                $_SESSION['bill_message'] = 'New bill generated successfully.';
+                header('Location: success.php');
+                exit();
+            }
+
             $error = 'Unable to generate bill: ' . $insertStmt->error;
+            $insertStmt->close();
         }
-        $insertStmt->close();
+        $existingStmt->close();
     }
 }
 
@@ -112,6 +139,7 @@ $defaultMonth = date('Y-m');
         .bill-form .form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
         .bill-form .form-row.single { grid-template-columns: 1fr; }
         .bill-form button { margin-top: 18px; padding: 12px 18px; background: #007BFF; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+        .bill-form .btn-back { display: inline-block; margin-bottom: 16px; padding: 10px 14px; background: #6c757d; color: #fff; text-decoration: none; border-radius: 5px; }
         .bill-form .alert-error { margin-bottom: 16px; padding: 12px 14px; background: #ffe1e1; border: 1px solid #ff7b7b; color: #a41c1c; border-radius: 5px; }
         .bill-form .info-text { margin-top: 10px; color: #555; }
     </style>
@@ -119,13 +147,14 @@ $defaultMonth = date('Y-m');
 <body>
     <div class="bill-form">
         <h2>Generate Monthly Bill</h2>
+        <a href="owner_dashboard.php" class="btn-back">Back</a>
         <?php if ($error): ?>
             <div class="alert-error"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
 
         <?php if (count($agreements) === 0): ?>
             <p>No active agreements found for your account. Please confirm a tenant or create an agreement before generating a monthly bill.</p>
-            <p class="info-text"><a href="owner_dashboard.php">Return to dashboard</a></p>
+            <p class="info-text">You can go back to the dashboard using the Back button above.</p>
         <?php else: ?>
             <form method="post">
                 <label for="agreement_id">Select Agreement</label>

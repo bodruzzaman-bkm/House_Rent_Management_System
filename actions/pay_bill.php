@@ -46,14 +46,10 @@ if ($row['payment_status'] === 'Paid') {
     exit();
 }
 
-$update = "UPDATE monthly_bill SET payment_status = 'Paid' WHERE agreement_id = ? AND billing_month = ?";
-$stmt = $conn->prepare($update);
-$stmt->bind_param('is', $agreement_id, $billing_month);
-$stmt->execute();
-$stmt->close();
-
 $_SESSION['paid_bill_amount'] = $row['total_amount'];
 $_SESSION['paid_bill_month'] = $row['billing_month'];
 $_SESSION['paid_bill_location'] = $row['location'];
+$_SESSION['payment_message'] = 'Payment submitted. The bill will stay Unpaid until the owner marks it as Paid.';
+$_SESSION['payment_message_type'] = 'success';
 header('Location: ../pay_success.php');
 exit();

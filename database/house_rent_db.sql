@@ -154,6 +154,8 @@ CREATE TABLE `request` (
   `request_id` int(11) NOT NULL,
   `date` date NOT NULL,
   `request_status` varchar(50) NOT NULL,
+  `offer_advance` decimal(10,2) DEFAULT NULL,
+  `offer_start_date` date DEFAULT NULL,
   `tenant_id` int(11) NOT NULL,
   `flat_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

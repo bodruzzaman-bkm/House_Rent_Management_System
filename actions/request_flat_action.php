@@ -31,7 +31,7 @@ if ($result->num_rows === 0) {
 }
 $stmt->close();
 
-$duplicateQuery = "SELECT request_id FROM request WHERE tenant_id = ? AND flat_id = ? AND request_status IN ('Pending','Approved')";
+$duplicateQuery = "SELECT request_id FROM request WHERE tenant_id = ? AND flat_id = ? AND request_status IN ('Pending','In Process','Approved')";
 $stmt = $conn->prepare($duplicateQuery);
 $stmt->bind_param('ii', $tenant_id, $flat_id);
 $stmt->execute();

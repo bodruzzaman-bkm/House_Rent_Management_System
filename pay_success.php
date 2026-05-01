@@ -9,6 +9,8 @@ if (!isset($_SESSION['paid_bill_amount']) || !isset($_SESSION['paid_bill_month']
 $total = $_SESSION['paid_bill_amount'];
 $month = $_SESSION['paid_bill_month'];
 $location = $_SESSION['paid_bill_location'];
+$_SESSION['payment_message'] = 'Payment submitted successfully. The bill will remain Unpaid until the owner marks it as Paid.';
+$_SESSION['payment_message_type'] = 'success';
 
 unset($_SESSION['paid_bill_amount'], $_SESSION['paid_bill_month'], $_SESSION['paid_bill_location']);
 ?>
@@ -23,11 +25,11 @@ unset($_SESSION['paid_bill_amount'], $_SESSION['paid_bill_month'], $_SESSION['pa
 </head>
 <body>
     <div class="container">
-        <h1>Payment Successful</h1>
+        <h1>Payment Submitted</h1>
         <p><strong>Location:</strong> <?php echo htmlspecialchars($location); ?></p>
         <p><strong>Billing Month:</strong> <?php echo htmlspecialchars($month); ?></p>
         <p><strong>Amount Paid:</strong> <?php echo htmlspecialchars(number_format($total, 2)); ?> BDT</p>
-        <p><strong>Status:</strong> Paid</p>
+        <p><strong>Status:</strong> Pending Owner Confirmation</p>
         <br>
         <a href="tenant_bills.php">View My Bills</a>
         <br><br>

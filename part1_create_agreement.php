@@ -3,7 +3,24 @@ include("db.php");
 
 $message = '';
 
+function ensureAgreementFirstMonthRentColumn($conn)
+{
+    $checkSql = "SELECT COUNT(*) AS column_count
+                 FROM INFORMATION_SCHEMA.COLUMNS
+                 WHERE TABLE_SCHEMA = DATABASE()
+                   AND TABLE_NAME = 'agreement'
+                   AND COLUMN_NAME = 'first_month_rent'";
+    $checkResult = $conn->query($checkSql);
+    $row = $checkResult ? $checkResult->fetch_assoc() : null;
+
+    if (!$row || intval($row['column_count']) === 0) {
+        $conn->query("ALTER TABLE agreement ADD COLUMN first_month_rent int(11) NOT NULL DEFAULT 0 AFTER start_date");
+    }
+}
+
 if (isset($_POST['submit'])) {
+    ensureAgreementFirstMonthRentColumn($conn);
+
     $tenant_id = intval($_POST['tenant_id']);
     $flat_id = intval($_POST['flat_id']);
     $owner_id = intval($_POST['owner_id']);
@@ -19,7 +36,7 @@ if (isset($_POST['submit'])) {
         $base_rent = $data['asking_rent'];
 
         $sql1 = "INSERT INTO agreement (advance, start_date, first_month_rent, owner_id)
-                     VALUES ('$advance','$start_date','$base_rent','$owner_id')";
+                 VALUES ('$advance','$start_date','$base_rent','$owner_id')";
 
         if ($conn->query($sql1)) {
             $agreement_id = $conn->insert_id;
@@ -29,7 +46,7 @@ if (isset($_POST['submit'])) {
 
             $sql2 = "INSERT INTO monthly_bill 
                      (agreement_id, billing_month, base_rent, maintanance, electricity, gas, water, service_charge, total_amount, payment_status)
-                     VALUES ('$agreement_id','$month','$base_rent',0,0,0,0,0,0,'$base_rent','Unpaid')";
+                     VALUES ('$agreement_id','$month','$base_rent',0,0,0,0,0,'$base_rent','Unpaid')";
 
             if ($conn->query($sql2)) {
                 $message = 'Agreement created and first month bill recorded successfully.';

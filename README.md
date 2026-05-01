@@ -36,7 +36,6 @@ This platform ensures a secure and smooth experience. Owners can list flats, man
 
 - **Advance Payment & First Month's Entry:** Once a tenant is confirmed, the Owner formally enters the security deposit (advance) and the first month's initial rent amount into the Agreement.
 - **Dynamic Monthly Bill Generation:** Owners input monthly utilities (gas, electricity, water, service charges) which PHP combines with base rent for a total bill.
-- **Payment Confirmation & Due Tracker:** Tenants can view bill itemizations, and Owners mark bills as 'Paid' to automatically generate printable digital money receipts.
 
 ---
 
