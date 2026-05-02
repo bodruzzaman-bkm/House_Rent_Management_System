@@ -28,13 +28,14 @@ $owner_id = $_SESSION['user_id'];
 
         <div class="action-bar">
             <h2>My Listed Flats</h2>
-            <div>
-                <a href="post_flat.php" class="btn-post">+ Post New Flat</a>
-                <a href="view_requests.php" class="btn-post">View Rental Requests</a>
-                <a href="generate_bill.php" class="btn-post">Generate Monthly Bill</a>
-                <a href="owner_bills.php" class="btn-post">Manage Bills</a>
-                <a href="actions/logout_action.php" class="btn-logout">Logout</a>
-            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <a href="post_flat.php" class="btn-post">+ Post New Flat</a>
+            <a href="view_requests.php" class="btn-post">View Rental Requests</a>
+            <a href="generate_bill.php" class="btn-post">Generate Monthly Bill</a>
+            <a href="owner_bills.php" class="btn-post">Manage Bills</a>
+
+            <a href="actions/logout_action.php" class="btn-logout" style="margin-left: auto;">Logout</a>
         </div>
 
         <?php
