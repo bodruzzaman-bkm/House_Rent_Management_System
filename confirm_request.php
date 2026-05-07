@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $updateRequest->close();
 
             $conn->commit();
-            $success = 'Rental offer sent to the tenant. The request will remain In Process until the tenant accepts or declines.';
+            $success = '✓ Offer sent successfully! The tenant will see this offer in their dashboard. They will need to accept the offer and pay the advance amount (BDT ' . number_format($advance) . ') to confirm the rental agreement.';
         } catch (Exception $e) {
             $conn->rollback();
             $error = 'Unable to confirm request: ' . $e->getMessage();
@@ -209,14 +209,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="hidden" name="request_id" value="<?php echo intval($request['request_id']); ?>">
 
                     <div class="form-group">
-                        <label for="advance">💰 Security Deposit (Advance)</label>
+                        <label for="advance">💰 Security Deposit (Advance) *</label>
                         <input type="number" id="advance" name="advance" min="0" step="0.01" value="0" required placeholder="e.g., 50000">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="monthly_rent">📅 Monthly Rent</label>
-                        <input type="number" id="monthly_rent" value="<?php echo intval($request['asking_rent']); ?>" readonly>
-                    </div>
+                        <small style="color:#6b7280;font-size:12px;margin-top:4px;display:block">The tenant must pay this amount before the agreement is finalized</small>
 
                     <div class="form-group">
                         <label for="start_date">📆 Agreement Start Date</label>
@@ -229,6 +224,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
             </form>
+            <p style="font-size:13px;color:#6b7280;margin-top:16px;background:#f9fafb;padding:10px;border-radius:6px">
+                📌 <strong>Note:</strong> After you send this offer, the tenant will see it in their dashboard. They will need to accept and pay the advance amount to confirm the agreement.
+            </p>
         <?php else: ?>
             <div class="message-alert error-message">
                 ⚠️ This request is already in progress or has been processed.

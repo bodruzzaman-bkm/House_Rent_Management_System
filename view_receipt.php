@@ -105,66 +105,82 @@ if ($role === 'owner' && $receipt['owner_id'] != $user_id) {
     <title>Receipt - <?php echo htmlspecialchars($receipt['receipt_number']); ?></title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        body { font-family: Arial, Helvetica, sans-serif; background: #f4f6f8; }
-        .receipt-wrap { max-width: 800px; margin: 20px auto; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
-        .r-header { background: #263447; color: #fff; padding: 18px 24px; display:flex; align-items:center; justify-content:space-between; }
-        .r-brand { display:flex; align-items:center; gap:12px; }
-        .r-brand .logo { width:56px; height:36px; background:linear-gradient(135deg,#2bb7ff,#0052d4); border-radius:6px; display:inline-block; }
-        .r-title { font-size:18px; font-weight:700; }
-        .r-sub { background:#556377; color:#fff; padding:8px 24px; }
-        .receipt { padding:24px; }
-        .receipt h2 { margin:6px 0 14px 0; font-size:20px; }
-        .details { display:grid; grid-template-columns:1fr 1fr; gap:8px 24px; }
-        .label { color:#6b6f76; }
-        .value { text-align:right; font-weight:600; }
-        .full-row { grid-column:1 / -1; }
-        .note { margin-top:18px; color:#6b6f76; font-size:13px; }
-        .print-actions { margin-top:18px; }
-        .print-btn { display: inline-block; padding: 10px 14px; background: #007BFF; color: #fff; border-radius: 4px; text-decoration: none; }
-        .footer-bar { background:#1f2733; color:#cfd6dd; padding:10px 24px; font-size:12px; }
-        @media print { .no-print { display: none; } .receipt-wrap { box-shadow:none; margin:0; } }
+        :root{--primary:#2563eb;--accent:#10b981;--dark:#0f172a;--light:#f4f6f8}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--light);margin:0;padding:16px}
+        .receipt-wrap{max-width:800px;margin:20px auto;background:#fff;box-shadow:0 8px 32px rgba(0,0,0,0.1);border-radius:12px;overflow:hidden}
+        .r-header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:28px 24px;display:flex;align-items:center;justify-content:space-between}
+        .r-brand{display:flex;align-items:center;gap:14px}
+        .r-brand .logo{width:56px;height:56px;background:rgba(255,255,255,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px}
+        .r-title{font-size:20px;font-weight:700;letter-spacing:-0.5px}
+        .r-subtitle{font-size:12px;color:rgba(255,255,255,0.85);margin-top:2px}
+        .r-date{text-align:right;font-size:13px;color:rgba(255,255,255,0.9)}
+        .r-sub{background:rgba(102,126,234,0.1);color:var(--dark);padding:12px 24px;font-weight:600;border-left:4px solid var(--accent)}
+        .receipt{padding:32px 24px}
+        .receipt h2{margin:0 0 20px;font-size:18px;font-weight:700;color:var(--dark);letter-spacing:0.5px}
+        .details{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px}
+        .label{color:#6b7280;font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:0.5px}
+        .value{text-align:right;font-weight:600;color:var(--dark);font-size:14px}
+        .amount-value{color:var(--accent);font-size:18px;font-weight:700}
+        .full-row{grid-column:1 / -1}
+        .note{margin-top:24px;padding:12px 14px;background:var(--light);border-left:4px solid var(--accent);color:#6b7280;font-size:13px;border-radius:6px;line-height:1.5}
+        .print-actions{margin-top:24px;display:flex;gap:12px;align-items:center}
+        .print-btn{padding:11px 18px;background:linear-gradient(135deg,var(--accent),#059669);color:#fff;border:none;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px}
+        .print-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(16,185,129,0.3)}
+        .back-link{color:var(--primary);text-decoration:none;font-weight:600;font-size:14px;transition:color 0.2s}
+        .back-link:hover{color:#1e40af;text-decoration:underline}
+        .footer-bar{background:linear-gradient(135deg,#0f172a,#1f2937);color:#d1d5db;padding:14px 24px;font-size:12px;text-align:center}
+        @media print{.no-print{display:none}.receipt-wrap{box-shadow:none;margin:0;border-radius:0}.print-actions{display:none}}
+        @media(max-width:600px){.receipt-wrap{border-radius:0;box-shadow:none;margin:0}.r-header{flex-direction:column;gap:12px;text-align:center}.r-date{text-align:center}.details{grid-template-columns:1fr;gap:10px}.value{text-align:left}}
     </style>
 </head>
 <body>
 <div class="receipt-wrap">
     <div class="r-header">
         <div class="r-brand">
-            <div class="logo" aria-hidden="true"></div>
+            <div class="logo">🏦</div>
             <div>
-                <div class="r-title">ZigBank</div>
-                <div style="font-size:12px; color:#c7d0d8;">Payment Receipt</div>
+                <div class="r-title">House Rent System</div>
+                <div class="r-subtitle">Official Payment Receipt</div>
             </div>
         </div>
-        <div style="text-align:right; font-size:13px;">
-            <?php echo date('d M Y H:i:s', strtotime($receipt['paid_at'])); ?>
+        <div class="r-date">
+            📅 <?php echo date('d M Y • H:i', strtotime($receipt['paid_at'])); ?>
         </div>
     </div>
-    <div class="r-sub"><?php echo htmlspecialchars($receipt['owner_name'] ?? ''); ?></div>
+    <div class="r-sub">👤 Recipient: <?php echo htmlspecialchars($receipt['owner_name'] ?? 'N/A'); ?></div>
     <div class="receipt">
-        <h2>INTERNAL PAY NOW</h2>
+        <h2>✓ Payment Receipt</h2>
         <div class="details">
-            <div class="label">Reference Number</div><div class="value"><?php echo htmlspecialchars($receipt['receipt_number']); ?></div>
-            <div class="label">Transfer to</div><div class="value"><?php echo htmlspecialchars($receipt['owner_name']); ?></div>
-            <div class="label">Account Type</div><div class="value">Internal</div>
-            <div class="label">Account Number</div><div class="value"><?php echo htmlspecialchars(substr($receipt['owner_account'] ?? 'N/A', -4) ? str_repeat('X', max(0, strlen($receipt['owner_account'] ?? '')-4)).substr($receipt['owner_account'] ?? '', -4) : 'N/A'); ?></div>
-            <div class="label">Account Name</div><div class="value"><?php echo htmlspecialchars($receipt['owner_name']); ?></div>
-            <div class="label">Transfer From</div><div class="value"><?php
-                $tp = $receipt['tenant_phone'] ?? '';
-                echo $tp ? (str_repeat('X', max(0, strlen($tp)-4)) . substr($tp, -4)) : 'N/A';
-            ?></div>
-            <div class="label">Amount</div><div class="value">BDT <?php echo number_format($receipt['amount']); ?></div>
-            <div class="label">Transfer When</div><div class="value"><?php echo htmlspecialchars($receipt['paid_at']); ?></div>
-            <div class="label full-row">Purpose</div><div class="value full-row" style="text-align:left; font-weight:400; color:#333;">Rent payment for <?php echo htmlspecialchars($receipt['billing_month']); ?> (Agreement <?php echo htmlspecialchars($receipt['agreement_id']); ?>)</div>
+            <div class="label">Receipt Number</div><div class="value"><?php echo htmlspecialchars($receipt['receipt_number']); ?></div>
+            
+            <div class="label">Paid By (Tenant)</div><div class="value"><?php echo htmlspecialchars($receipt['tenant_name'] ?? 'N/A'); ?></div>
+            
+            <div class="label">Paid To (Owner)</div><div class="value"><?php echo htmlspecialchars($receipt['owner_name']); ?></div>
+            
+            <div class="label">Billing Period</div><div class="value"><?php echo htmlspecialchars($receipt['billing_month']); ?></div>
+            
+            <div class="label">Payment Amount</div><div class="value amount-value">BDT <?php echo number_format($receipt['amount']); ?></div>
+            
+            <div class="label">Payment Date</div><div class="value"><?php echo htmlspecialchars($receipt['paid_at']); ?></div>
+            
+            <div class="label">Agreement ID</div><div class="value">#<?php echo htmlspecialchars($receipt['agreement_id']); ?></div>
+            
+            <div class="label">Payment Status</div><div class="value" style="color:#10b981;font-weight:700">✓ Paid</div>
+            
+            <div class="label full-row">📝 Description</div>
+            <div class="value full-row" style="text-align:left;font-weight:400;color:#4b5563">Rent payment for <?php echo htmlspecialchars($receipt['billing_month']); ?> | Agreement ID: <?php echo htmlspecialchars($receipt['agreement_id']); ?></div>
         </div>
 
-        <p class="note">This is computer generated receipt no signature required. Electronic Receipt owns no official legal effect, You may go to branch to get the paper receipt.</p>
+        <p class="note">
+            💡 <strong>This is a computer-generated receipt.</strong> No signature required. Electronic receipts are valid proof of payment. For a paper receipt, please contact your property manager or visit the office.
+        </p>
 
         <div class="no-print print-actions">
-            <button onclick="window.print()" class="print-btn">Print Receipt</button>
-            <a href="tenant_bills.php" style="margin-left:12px; color:#333;">Back to Bills</a>
+            <button onclick="window.print()" class="print-btn">🖨️ Print Receipt</button>
+            <a href="tenant_bills.php" class="back-link">← Back to Bills</a>
         </div>
     </div>
-    <div class="footer-bar">Copyright © <?php echo date('Y'); ?> House Rent Management System. All rights reserved.</div>
+    <div class="footer-bar">© <?php echo date('Y'); ?> House Rent Management System. All rights reserved. | Secure Document</div>
 </div>
 </body>
 </html>

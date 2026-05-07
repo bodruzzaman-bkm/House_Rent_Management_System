@@ -62,11 +62,11 @@ $latestBillStmt->close();
 $latestBillStatus = $latestBill['payment_status'] ?? '';
 $latestBillIsPaid = strtolower((string) $latestBillStatus) === 'paid';
 
-$offerSql = "SELECT r.request_id, r.offer_advance, r.offer_start_date, f.location, uo.name AS owner_name
+        $offerSql = "SELECT r.request_id, r.offer_advance, r.offer_start_date, r.request_status, f.location, uo.name AS owner_name
              FROM request r
              JOIN flat f ON r.flat_id = f.flat_id
              JOIN user uo ON f.owner_id = uo.user_id
-             WHERE r.tenant_id = ? AND r.request_status = 'In Process'
+             WHERE r.tenant_id = ? AND r.request_status IN ('In Process', 'Pending Advance Payment')
              ORDER BY r.date DESC";
 $offerStmt = $conn->prepare($offerSql);
 $offerStmt->bind_param('i', $_SESSION['user_id']);
@@ -202,10 +202,17 @@ $offerResult = $offerStmt->get_result();
                                 <span class="card-label">Start Date:</span>
                                 <span class="card-value"><?php echo htmlspecialchars($offer['offer_start_date']); ?></span>
                             </div>
-                            <div style="margin-top:10px;display:flex;gap:8px">
-                                <a href="actions/accept_rental_offer.php?request_id=<?php echo urlencode($offer['request_id']); ?>" class="card-btn btn-accept" style="margin-top:0;flex:1;text-align:center">✓ Accept</a>
-                                <a href="actions/decline_rental_offer.php?request_id=<?php echo urlencode($offer['request_id']); ?>" class="card-btn btn-decline" style="margin-top:0;flex:1;text-align:center">✕ Decline</a>
-                            </div>
+                    <?php if ($offer['request_status'] === 'In Process'): ?>
+                        <div style="margin-top:10px;display:flex;gap:8px">
+                            <a href="actions/accept_rental_offer.php?request_id=<?php echo urlencode($offer['request_id']); ?>" class="card-btn btn-accept" style="margin-top:0;flex:1;text-align:center">✓ Accept</a>
+                            <a href="actions/decline_rental_offer.php?request_id=<?php echo urlencode($offer['request_id']); ?>" class="card-btn btn-decline" style="margin-top:0;flex:1;text-align:center">✕ Decline</a>
+                        </div>
+                    <?php elseif ($offer['request_status'] === 'Pending Advance Payment'): ?>
+                        <div style="margin-top:10px">
+                            <div class="card-status-unpaid" style="display:inline-block;margin-bottom:8px">⏱ Awaiting Payment</div>
+                            <a href="pay_advance.php?request_id=<?php echo urlencode($offer['request_id']); ?>" class="card-btn btn-accept" style="width:100%;text-align:center;display:block">💳 Pay Advance (BDT <?php echo number_format($offer['offer_advance'], 0); ?>)</a>
+                        </div>
+                    <?php endif; ?>
                         </div>
                     <?php endwhile; ?>
                 <?php else: ?>
@@ -216,11 +223,6 @@ $offerResult = $offerStmt->get_result();
         </div>
 
         <h2 style="margin:24px 0 16px;color:#0f172a">🏘️ Available Flats for Rent</h2>
-            <?php else: ?>
-                <p>No rental offers are waiting for your response.</p>
-            <?php endif; ?>
-            <?php $offerStmt->close(); ?>
-        </div>
 
         <?php
         $sql = "SELECT * FROM flat WHERE status IN ('Available', 'available', 'AVAILABLE') ORDER BY flat_id DESC";

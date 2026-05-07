@@ -9,11 +9,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'owner') {
 
 $owner_id = $_SESSION['user_id'];
 
-$query = "SELECT r.request_id, u.name, f.location, r.request_status
+    $query = "SELECT r.request_id, u.name, f.location, r.request_status, r.offer_advance
           FROM request r
           JOIN flat f ON r.flat_id = f.flat_id
           JOIN user u ON r.tenant_id = u.user_id
-          WHERE f.owner_id = ?";
+          WHERE f.owner_id = ? AND r.request_status IN ('Pending', 'In Process', 'Pending Advance Payment')";
 $stmt = $conn->prepare($query);
 $stmt->bind_param('i', $owner_id);
 $stmt->execute();
@@ -74,13 +74,30 @@ $result = $stmt->get_result();
                     <div class="request-info">
                         <div class="request-tenant">👤 <?php echo htmlspecialchars($row['name']); ?></div>
                         <div class="request-detail">🏠 <strong>Property:</strong> <?php echo htmlspecialchars($row['location']); ?></div>
-                        <div class="request-status <?php echo ($row['request_status'] === 'Pending' ? 'status-pending' : 'status-confirmed'); ?>">
-                            <?php echo ($row['request_status'] === 'Pending' ? '⏱ Pending' : '✓ Confirmed'); ?>
+                        <div class="request-status <?php 
+                            if ($row['request_status'] === 'Pending') echo 'status-pending';
+                            elseif ($row['request_status'] === 'In Process') echo 'status-pending';
+                            elseif ($row['request_status'] === 'Pending Advance Payment') echo 'status-pending';
+                        ?>">
+                            <?php 
+                                if ($row['request_status'] === 'Pending') echo '⏱ Pending Response';
+                                elseif ($row['request_status'] === 'In Process') echo '✉️ Offer Sent';
+                                elseif ($row['request_status'] === 'Pending Advance Payment') echo '💳 Awaiting Payment';
+                            ?>
                         </div>
+                        <?php if ($row['request_status'] === 'Pending Advance Payment'): ?>
+                            <div style="margin-top:8px;padding:8px 10px;background:#fef3c7;border-radius:6px;font-size:12px;color:#92400e">
+                                💡 Tenant is paying BDT <?php echo number_format($row['offer_advance'], 0); ?> advance
+                            </div>
+                        <?php endif; ?>
                     </div>
                     <?php if ($row['request_status'] === 'Pending') { ?>
                         <div class="request-actions">
                             <a href="confirm_request.php?id=<?php echo $row['request_id']; ?>" class="btn-confirm">✓ Accept Request</a>
+                        </div>
+                    <?php } elseif ($row['request_status'] === 'Pending Advance Payment') { ?>
+                        <div class="request-actions">
+                            <button class="btn-confirm" style="background:#9ca3af;cursor:not-allowed" disabled>⏳ Awaiting Payment</button>
                         </div>
                     <?php } ?>
                 </div>

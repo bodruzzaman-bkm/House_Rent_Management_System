@@ -17,7 +17,7 @@ if ($request_id <= 0) {
     exit();
 }
 
-$verify = "SELECT r.request_id, r.flat_id, r.offer_advance, r.offer_start_date, r.request_status, f.owner_id, f.asking_rent
+$verify = "SELECT r.request_id, r.flat_id, r.offer_advance, r.offer_start_date, r.request_status, f.owner_id, f.asking_rent, f.location
            FROM request r
            JOIN flat f ON r.flat_id = f.flat_id
            WHERE r.request_id = ? AND r.tenant_id = ? AND r.request_status = 'In Process'";
@@ -37,50 +37,26 @@ if ($result->num_rows === 0) {
 $offer = $result->fetch_assoc();
 $stmt->close();
 
-$conn->begin_transaction();
-try {
-    $first_month_rent = intval($offer['asking_rent']);
-    $offer_advance = floatval($offer['offer_advance']);
-    $start_date = $offer['offer_start_date'];
-    $billing_month = date('F-Y', strtotime($start_date));
+// Mark the request as "Pending Advance Payment" instead of directly approving
+$updateRequest = $conn->prepare("UPDATE request SET request_status = 'Pending Advance Payment' WHERE request_id = ?");
+$updateRequest->bind_param('i', $request_id);
+$updateRequest->execute();
+$updateRequest->close();
 
-    $insertAgreement = $conn->prepare("INSERT INTO agreement (advance, start_date, first_month_rent, owner_id) VALUES (?, ?, ?, ?)");
-    $insertAgreement->bind_param('dsii', $offer_advance, $start_date, $first_month_rent, $offer['owner_id']);
-    $insertAgreement->execute();
-    $agreement_id = $conn->insert_id;
-    $insertAgreement->close();
+// Store advance payment details in session for payment page
+$_SESSION['pending_advance'] = [
+    'request_id' => $request_id,
+    'offer_advance' => $offer['offer_advance'],
+    'offer_start_date' => $offer['offer_start_date'],
+    'flat_id' => $offer['flat_id'],
+    'owner_id' => $offer['owner_id'],
+    'asking_rent' => $offer['asking_rent'],
+    'location' => $offer['location']
+];
 
-    $insertLink = $conn->prepare("INSERT INTO links (agreement_id, tenant_id, flat_id) VALUES (?, ?, ?)");
-    $insertLink->bind_param('iii', $agreement_id, $tenant_id, $offer['flat_id']);
-    $insertLink->execute();
-    $insertLink->close();
+$_SESSION['request_message'] = 'Offer accepted! Please pay the advance amount to complete your registration.';
+$_SESSION['request_message_type'] = 'info';
 
-    $insertBill = $conn->prepare("INSERT INTO monthly_bill
-        (agreement_id, billing_month, base_rent, maintanance, electricity, gas, water, service_charge, total_amount, payment_status)
-        VALUES (?, ?, ?, 0, 0, 0, 0, 0, ?, 'Unpaid')");
-    $insertBill->bind_param('isii', $agreement_id, $billing_month, $first_month_rent, $first_month_rent);
-    $insertBill->execute();
-    $insertBill->close();
-
-    $updateRequest = $conn->prepare("UPDATE request SET request_status = 'Approved' WHERE request_id = ?");
-    $updateRequest->bind_param('i', $request_id);
-    $updateRequest->execute();
-    $updateRequest->close();
-
-    $updateFlat = $conn->prepare("UPDATE flat SET status='Rented' WHERE flat_id = ?");
-    $updateFlat->bind_param('i', $offer['flat_id']);
-    $updateFlat->execute();
-    $updateFlat->close();
-
-    $conn->commit();
-    $_SESSION['request_message'] = 'Offer accepted. The flat is now rented and the first bill has been created.';
-    $_SESSION['request_message_type'] = 'success';
-    header('Location: ../tenant_dashboard.php');
-    exit();
-} catch (Exception $e) {
-    $conn->rollback();
-    $_SESSION['request_message'] = 'Unable to accept the offer: ' . $e->getMessage();
-    $_SESSION['request_message_type'] = 'error';
-    header('Location: ../tenant_dashboard.php');
-    exit();
-}
+// Redirect to advance payment page
+header('Location: ../pay_advance.php?request_id=' . urlencode($request_id));
+exit();
