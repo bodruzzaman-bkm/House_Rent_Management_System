@@ -81,73 +81,141 @@ $offerResult = $offerStmt->get_result();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tenant Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root{--primary:#2563eb;--accent:#10b981;--bg:#f4f6f8}
+        body{background:var(--bg)}
+        .dashboard-header{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:36px 24px;margin-bottom:24px}
+        .dashboard-header h1{font-size:28px;margin-bottom:4px}
+        .dashboard-header p{font-size:15px;opacity:0.9}
+        .navbar{background:#fff;padding:16px 24px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.06);margin:0 24px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+        .navbar h2{margin:0;font-size:16px}
+        .navbar-actions{display:flex;gap:10px;flex-wrap:wrap}
+        .btn-nav{padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;transition:all 0.2s}
+        .btn-browse{background:var(--primary);color:#fff}
+        .btn-bills{background:var(--accent);color:#fff}
+        .btn-logout{background:#ef4444;color:#fff}
+        .btn-nav:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,0.1)}
+        .dashboard-container{max-width:1000px;margin:0 auto;padding:0 16px 24px}
+        .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:24px}
+        .dashboard-card{background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.06);padding:20px}
+        .card-title{font-size:16px;font-weight:700;color:#0f172a;margin-bottom:12px}
+        .card-status-paid{background:#ecfdf5;color:#065f46;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700;display:inline-block}
+        .card-status-unpaid{background:#fff7ed;color:#92400e;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700;display:inline-block}
+        .card-row{display:flex;justify-content:space-between;margin:8px 0;font-size:14px}
+        .card-label{color:#6b7280;font-weight:600}
+        .card-value{color:#1f2937}
+        .card-btn{display:inline-block;padding:10px 14px;background:var(--primary);color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:13px;margin-top:12px;transition:all 0.2s}
+        .card-btn:hover{background:#1e40af}
+        .btn-accept{background:var(--accent)}
+        .btn-decline{background:#ef4444;margin-left:8px}
+        .flat-card{background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.06);padding:20px;margin-bottom:16px;border-left:4px solid var(--primary)}
+        .flat-card h3{margin-bottom:8px;color:#0f172a}
+        .flat-card p{margin:6px 0;color:#4b5563;font-size:14px}
+        .message-alert{margin-bottom:16px;padding:14px;border-radius:8px;font-size:14px;max-width:100%}
+        .message-success{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
+        .message-error{background:#fff7ed;border:1px solid #fed7aa;color:#92400e}
+        @media(max-width:800px){.navbar{flex-direction:column;align-items:flex-start}.card-grid{grid-template-columns:1fr}}
+    </style>
 </head>
 
 <body>
 
+    <div class="dashboard-header">
+        <h1>👋 Welcome, <?php echo htmlspecialchars($_SESSION['name']); ?>!</h1>
+        <p>Manage your rental properties and bills</p>
+    </div>
+
+    <div class="navbar">
+        <h2>Dashboard</h2>
+        <div class="navbar-actions">
+            <a href="browse_flats.php" class="btn-nav btn-browse">🏠 Browse Flats</a>
+            <a href="tenant_bills.php" class="btn-nav btn-bills">💰 View Bills</a>
+            <a href="actions/logout_action.php" class="btn-nav btn-logout">🚪 Logout</a>
+        </div>
+    </div>
+
     <div class="dashboard-container">
-        <div class="header-tenant">
-            <h1>Welcome Tenant, <?php echo htmlspecialchars($_SESSION['name']); ?>!</h1>
-            <p>Find your perfect home.</p>
-        </div>
-
-        <div class="action-bar">
-            <h2>Available Flats to Rent</h2>
-            <div>
-                <a href="browse_flats.php" class="btn-post">Browse Flats</a>
-                <a href="tenant_bills.php" class="btn-post">View My Bills</a>
-                <a href="actions/logout_action.php" class="btn-logout">Logout</a>
-            </div>
-        </div>
-
         <?php if ($message): ?>
-            <div style="margin: 20px auto; max-width: 700px; padding: 12px 16px; border-radius: 6px; background: <?php echo $message_type === 'success' ? '#d4edda' : ($message_type === 'error' ? '#f8d7da' : '#fff3cd'); ?>; border: 1px solid <?php echo $message_type === 'success' ? '#c3e6cb' : ($message_type === 'error' ? '#f5c6cb' : '#ffeeba'); ?>; color: <?php echo $message_type === 'success' ? '#155724' : ($message_type === 'error' ? '#721c24' : '#856404'); ?>;">
+            <div class="message-alert <?php echo $message_type === 'success' ? 'message-success' : 'message-error'; ?>">
                 <?php echo htmlspecialchars($message); ?>
             </div>
         <?php endif; ?>
 
         <?php if ($payment_message): ?>
-            <div style="margin: 20px auto; max-width: 700px; padding: 12px 16px; border-radius: 6px; background: <?php echo $payment_message_type === 'success' ? '#d4edda' : ($payment_message_type === 'error' ? '#f8d7da' : '#fff3cd'); ?>; border: 1px solid <?php echo $payment_message_type === 'success' ? '#c3e6cb' : ($payment_message_type === 'error' ? '#f5c6cb' : '#ffeeba'); ?>; color: <?php echo $payment_message_type === 'success' ? '#155724' : ($payment_message_type === 'error' ? '#721c24' : '#856404'); ?>;">
+            <div class="message-alert <?php echo $payment_message_type === 'success' ? 'message-success' : 'message-error'; ?>">
                 <?php echo htmlspecialchars($payment_message); ?>
             </div>
         <?php endif; ?>
 
-        <div style="margin: 20px auto; max-width: 700px; padding: 16px; border-radius: 8px; background: #ffffff; border: 1px solid #e6e6e6; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-            <h3 style="margin-top: 0;">Latest Monthly Bill</h3>
-            <?php if ($latestBill): ?>
-                <?php $latestBillPayUrl = 'actions/pay_bill.php?agreement_id=' . urlencode($latestBill['agreement_id']) . '&billing_month=' . urlencode($latestBill['billing_month']); ?>
-                <p><strong>Owner:</strong> <?php echo htmlspecialchars($latestBill['owner_name']); ?></p>
-                <p><strong>Location:</strong> <?php echo htmlspecialchars($latestBill['location']); ?></p>
-                <p><strong>Month:</strong> <?php echo htmlspecialchars($latestBill['billing_month']); ?></p>
-                <p><strong>Total Amount:</strong> <?php echo htmlspecialchars(number_format($latestBill['total_amount'], 2)); ?> BDT</p>
-                <p><strong>Status:</strong> <?php echo $latestBillIsPaid ? 'Paid' : 'Unpaid'; ?></p>
-                <?php if (!$latestBillIsPaid): ?>
-                    <p>
-                        <a href="<?php echo htmlspecialchars($latestBillPayUrl); ?>" class="btn-request" style="display: inline-block; padding: 10px 16px; text-decoration: none;">Pay This Bill</a>
-                    </p>
+        <div class="card-grid">
+            <div class="dashboard-card">
+                <h3 class="card-title">📊 Latest Monthly Bill</h3>
+                <?php if ($latestBill): ?>
+                    <?php $latestBillPayUrl = 'actions/pay_bill.php?agreement_id=' . urlencode($latestBill['agreement_id']) . '&billing_month=' . urlencode($latestBill['billing_month']); ?>
+                    <div class="card-row">
+                        <span class="card-label">Owner:</span>
+                        <span class="card-value"><?php echo htmlspecialchars($latestBill['owner_name']); ?></span>
+                    </div>
+                    <div class="card-row">
+                        <span class="card-label">Location:</span>
+                        <span class="card-value"><?php echo htmlspecialchars($latestBill['location']); ?></span>
+                    </div>
+                    <div class="card-row">
+                        <span class="card-label">Billing Month:</span>
+                        <span class="card-value"><?php echo htmlspecialchars($latestBill['billing_month']); ?></span>
+                    </div>
+                    <div class="card-row" style="margin:12px 0">
+                        <span class="card-label">Total Amount:</span>
+                        <span class="card-value" style="font-weight:700;color:#059669">BDT <?php echo number_format($latestBill['total_amount']); ?></span>
+                    </div>
+                    <div class="card-row">
+                        <span class="card-label">Status:</span>
+                        <span class="<?php echo $latestBillIsPaid ? 'card-status-paid' : 'card-status-unpaid'; ?>"><?php echo $latestBillIsPaid ? '✓ Paid' : '⏱ Unpaid'; ?></span>
+                    </div>
+                    <?php if (!$latestBillIsPaid): ?>
+                        <a href="<?php echo htmlspecialchars($latestBillPayUrl); ?>" class="card-btn">💳 Pay Now</a>
+                    <?php endif; ?>
+                    <a href="tenant_bills.php" class="card-btn" style="background:#6b7280">📋 View All Bills</a>
+                <?php else: ?>
+                    <p>No monthly bill has been generated for you yet.</p>
                 <?php endif; ?>
-            <?php else: ?>
-                <p>No monthly bill has been generated for you yet.</p>
-            <?php endif; ?>
-            <p style="margin-bottom: 0;"><a href="tenant_bills.php">View All Bills</a></p>
+            </div>
+
+            <div class="dashboard-card">
+                <h3 class="card-title">🎯 Rental Offers</h3>
+                <?php if ($offerResult->num_rows > 0): ?>
+                    <?php while ($offer = $offerResult->fetch_assoc()): ?>
+                        <div style="padding:12px;background:#f9fafb;border-radius:8px;margin-bottom:10px">
+                            <div class="card-row">
+                                <span class="card-label">Owner:</span>
+                                <span class="card-value"><?php echo htmlspecialchars($offer['owner_name']); ?></span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Location:</span>
+                                <span class="card-value"><?php echo htmlspecialchars($offer['location']); ?></span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Advance:</span>
+                                <span class="card-value">BDT <?php echo number_format((float) $offer['offer_advance'], 2); ?></span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">Start Date:</span>
+                                <span class="card-value"><?php echo htmlspecialchars($offer['offer_start_date']); ?></span>
+                            </div>
+                            <div style="margin-top:10px;display:flex;gap:8px">
+                                <a href="actions/accept_rental_offer.php?request_id=<?php echo urlencode($offer['request_id']); ?>" class="card-btn btn-accept" style="margin-top:0;flex:1;text-align:center">✓ Accept</a>
+                                <a href="actions/decline_rental_offer.php?request_id=<?php echo urlencode($offer['request_id']); ?>" class="card-btn btn-decline" style="margin-top:0;flex:1;text-align:center">✕ Decline</a>
+                            </div>
+                        </div>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <p style="color:#6b7280">No rental offers pending.</p>
+                <?php endif; ?>
+                <?php $offerStmt->close(); ?>
+            </div>
         </div>
 
-        <div style="margin: 20px auto; max-width: 700px; padding: 16px; border-radius: 8px; background: #ffffff; border: 1px solid #e6e6e6; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-            <h3 style="margin-top: 0;">Rental Offers</h3>
-            <?php if ($offerResult->num_rows > 0): ?>
-                <?php while ($offer = $offerResult->fetch_assoc()): ?>
-                    <div style="padding: 12px 0; border-bottom: 1px solid #eee;">
-                        <p><strong>Owner:</strong> <?php echo htmlspecialchars($offer['owner_name']); ?></p>
-                        <p><strong>Location:</strong> <?php echo htmlspecialchars($offer['location']); ?></p>
-                        <p><strong>Advance:</strong> <?php echo htmlspecialchars(number_format((float) $offer['offer_advance'], 2)); ?> BDT</p>
-                        <p><strong>Start Date:</strong> <?php echo htmlspecialchars($offer['offer_start_date']); ?></p>
-                        <p><strong>Status:</strong> In Process</p>
-                        <p>
-                            <a href="actions/accept_rental_offer.php?request_id=<?php echo urlencode($offer['request_id']); ?>" class="btn-request" style="display: inline-block; padding: 10px 16px; text-decoration: none; margin-right: 8px;">Accept</a>
-                            <a href="actions/decline_rental_offer.php?request_id=<?php echo urlencode($offer['request_id']); ?>" class="btn-logout" style="display: inline-block; padding: 10px 16px; text-decoration: none;">Decline</a>
-                        </p>
-                    </div>
-                <?php endwhile; ?>
+        <h2 style="margin:24px 0 16px;color:#0f172a">🏘️ Available Flats for Rent</h2>
             <?php else: ?>
                 <p>No rental offers are waiting for your response.</p>
             <?php endif; ?>
@@ -159,33 +227,29 @@ $offerResult = $offerStmt->get_result();
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
+            echo '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">';
             while ($flat = $result->fetch_assoc()) {
         ?>
 
-                <div class="flat-card border-tenant">
-                    <h3>Flat Location: <?php echo htmlspecialchars($flat['location']); ?></h3>
-                    <p><strong>Detailed Address:</strong> <?php echo htmlspecialchars($flat['detailed_location']); ?></p>
-                    <p>
-                        <strong>Floor:</strong> <?php echo $flat['floor']; ?> |
-                        <strong>Area:</strong> <?php echo $flat['area']; ?> sq ft |
-                        <strong>Bedrooms:</strong> <?php echo $flat['bedroom']; ?>
-                    </p>
-                    <p style="font-size: 18px; color: #28a745;"><strong>Asking Rent:</strong> <?php echo number_format($flat['asking_rent']); ?> BDT</p>
-
-                    <p><strong>Owner Contact:</strong> (Hidden until agreement is confirmed)</p>
-
-                    <a href="actions/request_flat_action.php?flat_id=<?php echo $flat['flat_id']; ?>" class="btn-request">Send Rent Request</a>
+                <div class="flat-card">
+                    <h3>🏠 <?php echo htmlspecialchars($flat['location']); ?></h3>
+                    <p><?php echo htmlspecialchars($flat['detailed_location']); ?></p>
+                    <div style="display:flex;gap:12px;font-size:13px;color:#6b7280;margin:12px 0">
+                        <span>📏 <?php echo $flat['area']; ?> sqft</span>
+                        <span>🛏️ <?php echo $flat['bedroom']; ?> bed</span>
+                        <span>📍 Floor <?php echo $flat['floor']; ?></span>
+                    </div>
+                    <p style="font-size:18px;color:#059669;font-weight:700;margin:12px 0">💰 BDT <?php echo number_format($flat['asking_rent']); ?></p>
+                    <a href="actions/request_flat_action.php?flat_id=<?php echo $flat['flat_id']; ?>" class="card-btn" style="width:100%;text-align:center;margin-top:12px">📬 Send Request</a>
                 </div>
 
         <?php
             }
+            echo '</div>';
         } else {
-            echo "<p style='text-align: center; padding: 20px; background-color: white; border-radius: 5px;'>Sorry, no flats are available for rent right now. Please check back later!</p>";
+            echo "<div style='text-align:center;padding:40px;background:#fff;border-radius:12px'><p style='color:#6b7280'>No flats are available right now. Please check back later!</p></div>";
         }
         ?>
-
     </div>
 
 </body>
-
-</html>

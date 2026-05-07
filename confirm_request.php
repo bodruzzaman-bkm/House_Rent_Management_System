@@ -135,51 +135,111 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Confirm Request</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Rental Request</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root{--primary:#2563eb;--accent:#10b981;--bg:#f4f6f8;--success:#d1fae5;--error:#fee2e2}
+        body{background:var(--bg);margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+        .page-header{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:36px 24px;margin-bottom:32px;text-align:center}
+        .page-header h1{font-size:28px;margin:0 0 4px;font-weight:700}
+        .form-container{max-width:600px;margin:0 auto;padding:0 16px 32px;background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.06);padding:32px}
+        .message-alert{padding:14px 16px;border-radius:8px;margin-bottom:20px;font-weight:600;border-left:4px solid}
+        .success-message{background:var(--success);border-color:var(--accent);color:#065f46}
+        .error-message{background:var(--error);border-color:#ef4444;color:#991b1b}
+        .form-section{margin-bottom:24px}
+        .form-section-title{font-size:16px;font-weight:700;color:#0f172a;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid #e5e7eb}
+        .info-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #e5e7eb}
+        .info-row:last-child{border-bottom:none}
+        .info-label{color:#6b7280;font-weight:600;font-size:14px}
+        .info-value{color:#1f2937;font-weight:500;font-size:14px}
+        .form-group{margin-bottom:20px;display:flex;flex-direction:column}
+        .form-group label{margin-bottom:8px;font-weight:600;color:#0f172a;font-size:14px}
+        .form-group input{padding:12px;border:2px solid #e5e7eb;border-radius:8px;font-size:14px;transition:all 0.2s}
+        .form-group input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+        .form-group input:read-only{background:#f3f4f6;color:#6b7280;cursor:not-allowed}
+        .form-actions{display:flex;gap:12px;margin-top:24px}
+        .btn-submit{flex:1;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;transition:all 0.2s}
+        .btn-submit:hover{background:#059669;transform:translateY(-2px);box-shadow:0 6px 16px rgba(16,185,129,0.3)}
+        .btn-back{flex:1;padding:12px;background:#6b7280;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;transition:all 0.2s}
+        .btn-back:hover{background:#4b5563;transform:translateY(-2px)}
+        .form-title{font-size:20px;font-weight:700;color:#0f172a;margin-bottom:24px;text-align:center}
+        .back-link{display:inline-flex;align-items:center;gap:6px;padding:10px 14px;background:#f3f4f6;border-radius:8px;text-decoration:none;color:var(--primary);font-weight:600;margin-top:16px;transition:all 0.2s}
+        .back-link:hover{background:#e5e7eb;transform:translateY(-2px)}
+        @media(max-width:600px){.form-container{padding:24px}.form-actions{flex-direction:column}}
+    </style>
 </head>
 <body>
-<div class="container">
-    <h1>Confirm Tenant Request</h1>
+<div class="page-header">
+    <h1>🤝 Confirm Rental Request</h1>
+</div>
 
+<div class="form-container">
     <?php if ($error): ?>
-        <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
-    <?php endif; ?>
-
-    <?php if ($success): ?>
-        <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
-        <p><a href="view_requests.php">Back to requests</a></p>
+        <div class="message-alert error-message">❌ <?php echo htmlspecialchars($error); ?></div>
+        <a href="view_requests.php" class="back-link">← Back to Requests</a>
+    <?php elseif ($success): ?>
+        <div class="message-alert success-message">✓ <?php echo htmlspecialchars($success); ?></div>
+        <a href="view_requests.php" class="back-link">← Back to Requests</a>
     <?php elseif ($request): ?>
-        <?php
-            $requestId = isset($request['request_id']) ? (int) $request['request_id'] : 0;
-            $askingRent = isset($request['asking_rent']) ? (int) $request['asking_rent'] : 0;
-        ?>
-        <p><strong>Tenant:</strong> <?php echo htmlspecialchars($request['tenant_name']); ?></p>
-        <p><strong>Location:</strong> <?php echo htmlspecialchars($request['location']); ?></p>
-        <p><strong>Request Status:</strong> <?php echo htmlspecialchars($request['request_status']); ?></p>
+        <h2 class="form-title">📋 Make Rental Offer</h2>
+        
+        <div class="form-section">
+            <div class="form-section-title">Tenant & Property Details</div>
+            <div class="info-row">
+                <span class="info-label">👤 Tenant Name</span>
+                <span class="info-value"><?php echo htmlspecialchars($request['tenant_name']); ?></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">🏠 Property Location</span>
+                <span class="info-value"><?php echo htmlspecialchars($request['location']); ?></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">📊 Request Status</span>
+                <span class="info-value"><strong><?php echo htmlspecialchars($request['request_status']); ?></strong></span>
+            </div>
+        </div>
 
         <?php if ($request['request_status'] === 'Pending'): ?>
             <form method="post">
-                <input type="hidden" name="request_id" value="<?php echo $requestId; ?>">
+                <div class="form-section">
+                    <div class="form-section-title">Offer Terms</div>
+                    
+                    <input type="hidden" name="request_id" value="<?php echo intval($request['request_id']); ?>">
 
-                <label>Security Deposit (Advance)</label>
-                <input type="number" name="advance" min="0" step="0.01" value="0" required>
+                    <div class="form-group">
+                        <label for="advance">💰 Security Deposit (Advance)</label>
+                        <input type="number" id="advance" name="advance" min="0" step="0.01" value="0" required placeholder="e.g., 50000">
+                    </div>
 
-                <label>First Month's Initial Rent</label>
-                <input type="number" value="<?php echo htmlspecialchars((string) $askingRent); ?>" readonly>
+                    <div class="form-group">
+                        <label for="monthly_rent">📅 Monthly Rent</label>
+                        <input type="number" id="monthly_rent" value="<?php echo intval($request['asking_rent']); ?>" readonly>
+                    </div>
 
-                <label>Agreement Start Date</label>
-                <input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>" required>
+                    <div class="form-group">
+                        <label for="start_date">📆 Agreement Start Date</label>
+                        <input type="date" id="start_date" name="start_date" value="<?php echo date('Y-m-d'); ?>" required>
+                    </div>
 
-                <button type="submit">Send Rental Offer</button>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">✓ Send Offer</button>
+                        <a href="view_requests.php" class="btn-back">✕ Cancel</a>
+                    </div>
+                </div>
             </form>
         <?php else: ?>
-            <p>This request is already in progress or has been processed.</p>
-            <a href="view_requests.php">Back to requests</a>
+            <div class="message-alert error-message">
+                ⚠️ This request is already in progress or has been processed.
+            </div>
+            <a href="view_requests.php" class="back-link">← Back to Requests</a>
         <?php endif; ?>
     <?php else: ?>
-        <p>Request not found.</p>
-        <a href="view_requests.php">Back to requests</a>
+        <div class="message-alert error-message">
+            ❌ Request not found or has been deleted.
+        </div>
+        <a href="view_requests.php" class="back-link">← Back to Requests</a>
     <?php endif; ?>
 </div>
 </body>
