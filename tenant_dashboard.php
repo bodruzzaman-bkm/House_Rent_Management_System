@@ -15,11 +15,10 @@ $payment_message = $_SESSION['payment_message'] ?? '';
 $payment_message_type = $_SESSION['payment_message_type'] ?? '';
 unset($_SESSION['payment_message'], $_SESSION['payment_message_type']);
 
-// --- (First Member's 3rd Feature) Search Variables ---
+
 $search_location = $_GET['location'] ?? '';
 $search_max_rent = $_GET['max_rent'] ?? '';
 $search_bedroom = $_GET['bedroom'] ?? '';
-// -----------------------------------------------------
 
 function ensureRequestOfferColumns($conn)
 {
@@ -484,7 +483,6 @@ $offerResult = $offerStmt->get_result();
         <h2 style="margin:24px 0 16px;color:#0f172a">🏘️ Available Flats for Rent</h2>
 
         <?php
-        // --- First Member's Dynamic SQL Search Logic ---
         $sql = "SELECT * FROM flat WHERE status IN ('Available', 'available', 'AVAILABLE')";
         $params = [];
         $types = "";
