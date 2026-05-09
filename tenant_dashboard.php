@@ -15,6 +15,12 @@ $payment_message = $_SESSION['payment_message'] ?? '';
 $payment_message_type = $_SESSION['payment_message_type'] ?? '';
 unset($_SESSION['payment_message'], $_SESSION['payment_message_type']);
 
+// --- (First Member's 3rd Feature) Search Variables ---
+$search_location = $_GET['location'] ?? '';
+$search_max_rent = $_GET['max_rent'] ?? '';
+$search_bedroom = $_GET['bedroom'] ?? '';
+// -----------------------------------------------------
+
 function ensureRequestOfferColumns($conn)
 {
     $offerAdvanceCheck = "SELECT COUNT(*) AS column_count
@@ -62,7 +68,7 @@ $latestBillStmt->close();
 $latestBillStatus = $latestBill['payment_status'] ?? '';
 $latestBillIsPaid = strtolower((string) $latestBillStatus) === 'paid';
 
-        $offerSql = "SELECT r.request_id, r.offer_advance, r.offer_start_date, r.request_status, f.location, uo.name AS owner_name
+$offerSql = "SELECT r.request_id, r.offer_advance, r.offer_start_date, r.request_status, f.location, uo.name AS owner_name
              FROM request r
              JOIN flat f ON r.flat_id = f.flat_id
              JOIN user uo ON f.owner_id = uo.user_id
@@ -82,39 +88,283 @@ $offerResult = $offerStmt->get_result();
     <title>Tenant Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        :root{--primary:#2563eb;--accent:#10b981;--bg:#f4f6f8}
-        body{background:var(--bg)}
-        .dashboard-header{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:36px 24px;margin-bottom:24px}
-        .dashboard-header h1{font-size:28px;margin-bottom:4px}
-        .dashboard-header p{font-size:15px;opacity:0.9}
-        .navbar{background:#fff;padding:16px 24px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.06);margin:0 24px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-        .navbar h2{margin:0;font-size:16px}
-        .navbar-actions{display:flex;gap:10px;flex-wrap:wrap}
-        .btn-nav{padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;transition:all 0.2s}
-        .btn-browse{background:var(--primary);color:#fff}
-        .btn-bills{background:var(--accent);color:#fff}
-        .btn-logout{background:#ef4444;color:#fff}
-        .btn-nav:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,0.1)}
-        .dashboard-container{max-width:1000px;margin:0 auto;padding:0 16px 24px}
-        .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:24px}
-        .dashboard-card{background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.06);padding:20px}
-        .card-title{font-size:16px;font-weight:700;color:#0f172a;margin-bottom:12px}
-        .card-status-paid{background:#ecfdf5;color:#065f46;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700;display:inline-block}
-        .card-status-unpaid{background:#fff7ed;color:#92400e;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700;display:inline-block}
-        .card-row{display:flex;justify-content:space-between;margin:8px 0;font-size:14px}
-        .card-label{color:#6b7280;font-weight:600}
-        .card-value{color:#1f2937}
-        .card-btn{display:inline-block;padding:10px 14px;background:var(--primary);color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:13px;margin-top:12px;transition:all 0.2s}
-        .card-btn:hover{background:#1e40af}
-        .btn-accept{background:var(--accent)}
-        .btn-decline{background:#ef4444;margin-left:8px}
-        .flat-card{background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.06);padding:20px;margin-bottom:16px;border-left:4px solid var(--primary)}
-        .flat-card h3{margin-bottom:8px;color:#0f172a}
-        .flat-card p{margin:6px 0;color:#4b5563;font-size:14px}
-        .message-alert{margin-bottom:16px;padding:14px;border-radius:8px;font-size:14px;max-width:100%}
-        .message-success{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
-        .message-error{background:#fff7ed;border:1px solid #fed7aa;color:#92400e}
-        @media(max-width:800px){.navbar{flex-direction:column;align-items:flex-start}.card-grid{grid-template-columns:1fr}}
+        :root {
+            --primary: #2563eb;
+            --accent: #10b981;
+            --bg: #f4f6f8
+        }
+
+        body {
+            background: var(--bg)
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            padding: 36px 24px;
+            margin-bottom: 24px
+        }
+
+        .dashboard-header h1 {
+            font-size: 28px;
+            margin-bottom: 4px
+        }
+
+        .dashboard-header p {
+            font-size: 15px;
+            opacity: 0.9
+        }
+
+        .navbar {
+            background: #fff;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            margin: 0 24px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px
+        }
+
+        .navbar h2 {
+            margin: 0;
+            font-size: 16px
+        }
+
+        .navbar-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .btn-nav {
+            padding: 10px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s
+        }
+
+        .btn-browse {
+            background: var(--primary);
+            color: #fff
+        }
+
+        .btn-bills {
+            background: var(--accent);
+            color: #fff
+        }
+
+        .btn-logout {
+            background: #ef4444;
+            color: #fff
+        }
+
+        .btn-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1)
+        }
+
+        .dashboard-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 16px 24px
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px
+        }
+
+        .dashboard-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            padding: 20px
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 12px
+        }
+
+        .card-status-paid {
+            background: #ecfdf5;
+            color: #065f46;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block
+        }
+
+        .card-status-unpaid {
+            background: #fff7ed;
+            color: #92400e;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block
+        }
+
+        .card-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 14px
+        }
+
+        .card-label {
+            color: #6b7280;
+            font-weight: 600
+        }
+
+        .card-value {
+            color: #1f2937
+        }
+
+        .card-btn {
+            display: inline-block;
+            padding: 10px 14px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            margin-top: 12px;
+            transition: all 0.2s
+        }
+
+        .card-btn:hover {
+            background: #1e40af
+        }
+
+        .btn-accept {
+            background: var(--accent)
+        }
+
+        .btn-decline {
+            background: #ef4444;
+            margin-left: 8px
+        }
+
+        .flat-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--primary)
+        }
+
+        .flat-card h3 {
+            margin-bottom: 8px;
+            color: #0f172a
+        }
+
+        .flat-card p {
+            margin: 6px 0;
+            color: #4b5563;
+            font-size: 14px
+        }
+
+        .message-alert {
+            margin-bottom: 16px;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            max-width: 100%
+        }
+
+        .message-success {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46
+        }
+
+        .message-error {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #92400e
+        }
+
+        /* --- First Member's Search Form CSS --- */
+        .search-form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-form input {
+            flex: 1;
+            min-width: 180px;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-form input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-search {
+            background: var(--primary);
+            color: #fff;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-search:hover {
+            background: #1e40af;
+        }
+
+        .btn-clear {
+            background: #6b7280;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .btn-clear:hover {
+            background: #4b5563;
+        }
+
+        @media(max-width:800px) {
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr
+            }
+        }
     </style>
 </head>
 
@@ -202,17 +452,17 @@ $offerResult = $offerStmt->get_result();
                                 <span class="card-label">Start Date:</span>
                                 <span class="card-value"><?php echo htmlspecialchars($offer['offer_start_date']); ?></span>
                             </div>
-                    <?php if ($offer['request_status'] === 'In Process'): ?>
-                        <div style="margin-top:10px;display:flex;gap:8px">
-                            <a href="actions/accept_rental_offer.php?request_id=<?php echo urlencode($offer['request_id']); ?>" class="card-btn btn-accept" style="margin-top:0;flex:1;text-align:center">✓ Accept</a>
-                            <a href="actions/decline_rental_offer.php?request_id=<?php echo urlencode($offer['request_id']); ?>" class="card-btn btn-decline" style="margin-top:0;flex:1;text-align:center">✕ Decline</a>
-                        </div>
-                    <?php elseif ($offer['request_status'] === 'Pending Advance Payment'): ?>
-                        <div style="margin-top:10px">
-                            <div class="card-status-unpaid" style="display:inline-block;margin-bottom:8px">⏱ Awaiting Payment</div>
-                            <a href="pay_advance.php?request_id=<?php echo urlencode($offer['request_id']); ?>" class="card-btn btn-accept" style="width:100%;text-align:center;display:block">💳 Pay Advance (BDT <?php echo number_format($offer['offer_advance'], 0); ?>)</a>
-                        </div>
-                    <?php endif; ?>
+                            <?php if ($offer['request_status'] === 'In Process'): ?>
+                                <div style="margin-top:10px;display:flex;gap:8px">
+                                    <a href="actions/accept_rental_offer.php?request_id=<?php echo urlencode($offer['request_id']); ?>" class="card-btn btn-accept" style="margin-top:0;flex:1;text-align:center">✓ Accept</a>
+                                    <a href="actions/decline_rental_offer.php?request_id=<?php echo urlencode($offer['request_id']); ?>" class="card-btn btn-decline" style="margin-top:0;flex:1;text-align:center">✕ Decline</a>
+                                </div>
+                            <?php elseif ($offer['request_status'] === 'Pending Advance Payment'): ?>
+                                <div style="margin-top:10px">
+                                    <div class="card-status-unpaid" style="display:inline-block;margin-bottom:8px">⏱ Awaiting Payment</div>
+                                    <a href="pay_advance.php?request_id=<?php echo urlencode($offer['request_id']); ?>" class="card-btn btn-accept" style="width:100%;text-align:center;display:block">💳 Pay Advance (BDT <?php echo number_format($offer['offer_advance'], 0); ?>)</a>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     <?php endwhile; ?>
                 <?php else: ?>
@@ -222,11 +472,48 @@ $offerResult = $offerStmt->get_result();
             </div>
         </div>
 
+        <h2 style="margin:24px 0 16px;color:#0f172a">🔍 Find Your Perfect Flat</h2>
+        <form action="tenant_dashboard.php" method="GET" class="search-form">
+            <input type="text" name="location" placeholder="Area (e.g., Mirpur)" value="<?php echo htmlspecialchars($search_location); ?>">
+            <input type="number" name="max_rent" placeholder="Max Rent (BDT)" value="<?php echo htmlspecialchars($search_max_rent); ?>">
+            <input type="number" name="bedroom" placeholder="Bedrooms (e.g., 2)" value="<?php echo htmlspecialchars($search_bedroom); ?>">
+
+            <button type="submit" class="btn-search">Search</button>
+            <a href="tenant_dashboard.php" class="btn-clear">Clear Filters</a>
+        </form>
         <h2 style="margin:24px 0 16px;color:#0f172a">🏘️ Available Flats for Rent</h2>
 
         <?php
-        $sql = "SELECT * FROM flat WHERE status IN ('Available', 'available', 'AVAILABLE') ORDER BY flat_id DESC";
-        $result = $conn->query($sql);
+        // --- First Member's Dynamic SQL Search Logic ---
+        $sql = "SELECT * FROM flat WHERE status IN ('Available', 'available', 'AVAILABLE')";
+        $params = [];
+        $types = "";
+
+        if (!empty($search_location)) {
+            $sql .= " AND location LIKE ?";
+            $params[] = "%" . $search_location . "%";
+            $types .= "s";
+        }
+        if (!empty($search_max_rent)) {
+            $sql .= " AND asking_rent <= ?";
+            $params[] = $search_max_rent;
+            $types .= "i";
+        }
+        if (!empty($search_bedroom)) {
+            $sql .= " AND bedroom = ?";
+            $params[] = $search_bedroom;
+            $types .= "i";
+        }
+
+        $sql .= " ORDER BY flat_id DESC";
+
+        $stmt = $conn->prepare($sql);
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             echo '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">';
@@ -249,9 +536,12 @@ $offerResult = $offerStmt->get_result();
             }
             echo '</div>';
         } else {
-            echo "<div style='text-align:center;padding:40px;background:#fff;border-radius:12px'><p style='color:#6b7280'>No flats are available right now. Please check back later!</p></div>";
+            echo "<div style='text-align:center;padding:40px;background:#fff;border-radius:12px'><p style='color:#6b7280'>No flats match your search criteria. Try clearing the filters!</p></div>";
         }
+        $stmt->close();
         ?>
     </div>
 
 </body>
+
+</html>
